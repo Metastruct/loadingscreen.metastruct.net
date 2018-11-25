@@ -21,10 +21,13 @@
     "pug": "^2.0.3",
     "pug-plain-loader": "^1.0.0",
     "sass-loader": "^7.1.0",
+    "steamapi": "^2.0.3",
+    "steamid": "^1.1.0",
     "vue-infinite-grid": "^0.0.8",
     "vue-lazyload": "^1.2.6",
     "vue-observe-visibility": "^0.4.3",
-    "wilson-score-interval": "^2.0.1"
+    "wilson-score-interval": "^2.0.1",
+    "xml-js": "^1.6.8"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

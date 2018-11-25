@@ -3,7 +3,6 @@
 		nav.navbar.is-fixed-top
 			.navbar-brand
 				img.navbar-item(src="@/assets/logo.png")
-				.navbar-item Loading screens
 				.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
 					a.navbar-link(@click="toggleDropdown(0)") Sort by
 					.navbar-dropdown
@@ -11,22 +10,46 @@
 						hr.navbar-divider
 						a.navbar-item(@click="sortMethodReverse = false" :class="{ 'is-active': sortMethodReverse == false }") Ascending
 						a.navbar-item(@click="sortMethodReverse = true" :class="{ 'is-active': sortMethodReverse == true }") Descending
+				.navbar-item
+					input.input(type="text" placeholder="Filter by author" v-model="authorSearch")
+
+		section.hero.is-small.is-primary.is-bold
+			.hero-body
+				.container
+					h1.title Loading Screens
+					h2.subtitle
+						| Click on a picture to view it in full.
+						br
+						| Log in to vote, and perform administrative actions
 
 		section.section
 			my-justified-grid(v-if="screenshots.length > 0" ref="grid")
 				my-justified-grid-item(v-for="screenshot in sortedScreenshots")
-					img(:src="`http://g2.metastruct.net:2095/lsapi/i/${screenshot.id}.jpg`")
+					img(:src="`http://g2.metastruct.net:2095/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)")
+					.details
+						.votes
+							a.upvotes.has-text-success
+								i.material-icons.md-light thumb_up
+								span {{ screenshot.up }}
+							a.downvotes.has-text-danger
+								i.material-icons.md-light thumb_down
+								span {{ screenshot.down }}
+						a.is-dark(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
+						p(v-else) {{ screenshot.name }}
+
 			.google-loading(v-else)
 				Loading
 </template>
 
 <script>
 
-import axios from "axios"
 import MyJustifiedGrid from "@/components/MyJustifiedGrid.vue"
 import MyJustifiedGridItem from "@/components/MyJustifiedGridItem.vue"
 import Loading from "@/components/Loading.vue"
+
+import axios from "axios"
 import wilson from "wilson-score-interval"
+import SteamID from "steamid"
 
 export default {
 	components: {
@@ -36,11 +59,15 @@ export default {
 	},
 	data() {
 		return {
-			screenshots: [],
 			dropdowns: [ false ],
-			sortMethods: [ "ID", "Rating", "Last added" ],
+
+			screenshots: [],
+
+			sortMethods: [ "ID", "Rating", "Last added", "Author" ],
 			sortMethod: 0,
-			sortMethodReverse: false
+			sortMethodReverse: false,
+
+			authorSearch: ""
 		}
 	},
 	mounted() {
@@ -56,19 +83,28 @@ export default {
 			let sorted;
 
 			switch (this.sortMethod) {
-				case 0:
+				case 0: // ID
 					sorted = this.screenshots.sort((a, b) => {
 						return a.id > b.id
 					})
 					break
-				case 1:
+				case 1: // Rating
 					sorted = this.screenshots.sort((a, b) => {
 						return wilson(a.up, a.up + a.down).left > wilson(b.up, b.up + b.down)
 					})
 					break
-				case 2:
+				case 2: // Last added
 					sorted = this.screenshots.sort((a, b) => {
 						return a.created > b.created
+					})
+					break
+				case 3: // Author
+					sorted = this.screenshots.sort((a, b) => {
+						let aName = a.name.toLowerCase()
+						let bName = b.name.toLowerCase()
+
+						if (aName == bName) return a.id > b.id
+						else return aName > bName
 					})
 					break
 			}
@@ -76,12 +112,19 @@ export default {
 			if (sorted) {
 				if (this.sortMethodReverse) sorted = sorted.reverse()
 
-				return sorted
+				return sorted.filter(val => {
+					return val.name.toLowerCase().includes(this.authorSearch.toLowerCase())
+				})
 			}
 		},
 	},
 	watch: {
 		sortMethod() {
+			this.$nextTick(() => {
+				this.$forceUpdate()
+			})
+		},
+		authorSearch() {
 			this.$nextTick(() => {
 				this.$forceUpdate()
 			})
@@ -91,6 +134,18 @@ export default {
 		toggleDropdown(id) {
 			this.$set(this.dropdowns, id, !this.dropdowns[id])
 		},
+		viewScreenshot(url) {
+			window.open(url, "_blank")
+		},
+		getProfileURL(approver) {
+			return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(approver).getSteamID64()
+		},
+		/* Python exposed the name for us
+		getAuthorName(accountID) {
+
+			axios.get("")
+		}
+		*/
 	}
 }
 
@@ -101,7 +156,51 @@ export default {
 nav.navbar {
 	img.navbar-item {
 		padding: 0;
-		height: 64px;
+		height: 3.25rem;
+	}
+}
+
+.grid-item {
+	cursor: pointer;
+	overflow: hidden;
+
+	.details {
+		display: block;
+		position: relative;
+		text-align: left;
+		padding: 4px 8px;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		background: rgba(0, 0, 0, 0.5);
+
+		transform: translateY(0%);
+		transform-origin: center bottom;
+		opacity: 0;
+
+		transition: transform 0.25s ease-in, opacity 0.25s ease-in;
+
+		.votes {
+			float: right;
+
+			.upvotes, .downvotes {
+				margin: 0 4px;
+
+				display: inline-flex;
+				align-content: center;
+
+				span {
+					margin: 0 4px;
+				}
+			}
+		}
+	}
+
+	&:hover {
+		.details {
+			transform: translateY(-100%);
+			opacity: 1;
+		}
 	}
 }
 

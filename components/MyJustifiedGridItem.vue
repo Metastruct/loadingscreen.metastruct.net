@@ -39,6 +39,7 @@ $height: 216px;
     border: 1px solid darken($background, 7.5%);
 
     & > img {
+        display: block;
         width: $width;
         height: 100%;
         object-fit: cover;

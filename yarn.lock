@@ -2241,7 +2241,7 @@ csso@^3.5.0:
   dependencies:
     css-tree "1.0.0-alpha.29"
 
-cuint@^0.2.2:
+cuint@^0.2.1, cuint@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cuint/-/cuint-0.2.2.tgz#408086d409550c2631155619e9fa7bcadc3b991b"
 
@@ -6106,6 +6106,16 @@ stdout-stream@^1.4.0:
   dependencies:
     readable-stream "^2.0.1"
 
+steamapi@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/steamapi/-/steamapi-2.0.3.tgz#76b8257ce6c012fffa9183b1ab74b41b2fbc1c4c"
+
+steamid@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/steamid/-/steamid-1.1.0.tgz#eccfbf24547f4e9b1d27fcb83da62a6a41139986"
+  dependencies:
+    cuint "^0.2.1"
+
 stream-browserify@^2.0.1:
   version "2.0.1"
   resolved "http://registry.npmjs.org/stream-browserify/-/stream-browserify-2.0.1.tgz#66266ee5f9bdb9940a4e4514cafb43bb71e5c9db"
@@ -6943,6 +6953,12 @@ ws@^6.0.0:
 xdg-basedir@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xdg-basedir/-/xdg-basedir-3.0.0.tgz#496b2cc109eca8dbacfe2dc72b603c17c5870ad4"
+
+xml-js@^1.6.8:
+  version "1.6.8"
+  resolved "https://registry.yarnpkg.com/xml-js/-/xml-js-1.6.8.tgz#e06419c54235f18f4c2cdda824cbd65a782330de"
+  dependencies:
+    sax "^1.2.4"
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.1"
