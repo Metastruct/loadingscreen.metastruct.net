@@ -1,7 +1,7 @@
-const pkg = require('./package')
+const pkg = require("./package")
 
 module.exports = {
-  mode: 'spa',
+  mode: "spa",
 
   /*
   ** Headers of the page
@@ -9,24 +9,33 @@ module.exports = {
   head: {
     title: pkg.name,
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: pkg.description }
+      { charset: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { hid: "description", name: "description", content: pkg.description }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+    ],
+    bodyAttrs: {
+      class: "has-navbar-fixed-top"
+    }
   },
 
   /*
   ** Customize the progress-bar color
   */
-  loading: { color: '#fff' },
+  loading: { color: "#fff" },
+
+  loadingIndicator: {
+    name: "fading-circle",
+    color: "#00FFD8",
+  },
 
   /*
   ** Global CSS
   */
   css: [
+    "@/assets/style.scss",
   ],
 
   /*
@@ -40,9 +49,10 @@ module.exports = {
   */
   modules: [
     // Doc: https://github.com/nuxt-community/axios-module#usage
-    '@nuxtjs/axios',
+    "@nuxtjs/axios",
     // Doc:https://github.com/nuxt-community/modules/tree/master/packages/bulma
-    '@nuxtjs/bulma'
+    // "@nuxtjs/bulma"
+    "nuxt-material-design-icons"
   ],
   /*
   ** Axios module configuration
@@ -66,7 +76,7 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-      
+
     }
   }
 }

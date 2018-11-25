@@ -11,10 +11,20 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "cross-env": "^5.2.0",
-    "nuxt": "^2.0.0",
+    "@mdi/font": "^3.0.39",
+    "@nuxtjs/axios": "^5.0.0",
     "@nuxtjs/bulma": "^1.2.0",
-    "@nuxtjs/axios": "^5.0.0"
+    "cross-env": "^5.2.0",
+    "node-sass": "^4.10.0",
+    "nuxt": "^2.0.0",
+    "nuxt-material-design-icons": "^1.0.4",
+    "pug": "^2.0.3",
+    "pug-plain-loader": "^1.0.0",
+    "sass-loader": "^7.1.0",
+    "vue-infinite-grid": "^0.0.8",
+    "vue-lazyload": "^1.2.6",
+    "vue-observe-visibility": "^0.4.3",
+    "wilson-score-interval": "^2.0.1"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

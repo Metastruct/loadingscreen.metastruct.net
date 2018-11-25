@@ -1,0 +1,21 @@
+// Override Bulma variables
+
+// https://bulma.io/documentation/customize/variables/
+$body-background-color: #222222;
+$background: #222222;
+$text: #e4e4e4;
+$link: #0ce3ac;
+
+$navbar-background-color: lighten(#222222, 7.5%);
+$navbar-item-color: $text;
+$navbar-item-hover-background-color: darken($navbar-background-color, 3.25%);
+
+$navbar-divider-background-color: lighten($navbar-background-color, 7.5%);
+
+$navbar-dropdown-border-top: 2px solid $navbar-divider-background-color;
+$navbar-dropdown-background-color: $navbar-background-color;
+$navbar-dropdown-item-hover-background-color: $navbar-item-hover-background-color;
+$navbar-dropdown-item-hover-color: $link;
+
+// Import Bulma variables
+@import "~bulma/sass/utilities/_all.sass";
