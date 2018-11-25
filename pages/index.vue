@@ -2,7 +2,8 @@
 	div
 		nav.navbar.is-fixed-top
 			.navbar-brand
-				img.navbar-item(src="@/assets/logo.png")
+				a(href="https://metastruct.net")
+					img.navbar-item(src="@/assets/logo.png")
 				.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
 					a.navbar-link(@click="toggleDropdown(0)") Sort by
 					.navbar-dropdown
@@ -25,7 +26,7 @@
 		section.section
 			my-justified-grid(v-if="screenshots.length > 0" ref="grid")
 				my-justified-grid-item(v-for="screenshot in sortedScreenshots")
-					img(:src="`http://g2.metastruct.net:2095/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)")
+					img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)")
 					.details
 						.votes
 							a.upvotes.has-text-success

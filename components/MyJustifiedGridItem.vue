@@ -1,6 +1,6 @@
 <template lang="pug">
     .grid-item(v-observe-visibility="visibilityChanged")
-        slot(:class="{ 'is-hidden': !isVisible }")
+        slot(v-if="isVisible")
 </template>
 
 <script>
@@ -34,7 +34,7 @@ $height: 216px;
     text-align: center;
     max-width: $width;
     max-height: $height;
-    width: auto;
+    width: $width;
     height: $height;
     border: 1px solid darken($background, 7.5%);
 

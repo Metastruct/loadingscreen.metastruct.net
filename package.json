@@ -1,7 +1,7 @@
 {
   "name": "loadingscreen.metastruct.net",
   "version": "1.0.0",
-  "description": "My legendary Nuxt.js project",
+  "description": "Management and viewing of loading screens displayed when joining Meta Construct's Garry's Mod servers",
   "author": "Marceau Maubert",
   "private": true,
   "scripts": {
