@@ -10,8 +10,8 @@
 					span
 			.navbar-menu(:class="{ 'is-active': burger }")
 				.navbar-start
-					.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
-						a.navbar-link(@click="toggleDropdown(0)") Sort by
+					.navbar-item.has-dropdown.is-hoverable
+						a.navbar-link Sort by
 						.navbar-dropdown
 							a.navbar-item(v-for="(name, k) in sortMethods" @click="sortMethod = k" :class="{ 'is-active': sortMethod == k }") {{ name }}
 							hr.navbar-divider
