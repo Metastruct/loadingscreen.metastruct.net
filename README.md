@@ -1,6 +1,6 @@
 # loadingscreen.metastruct.net
 
-> My legendary Nuxt.js project
+> Management and viewing of loading screens displayed when joining Meta Construct's Garry's Mod servers
 
 ## Build Setup
 

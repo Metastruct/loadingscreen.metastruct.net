@@ -1,3 +1,5 @@
+<!-- TODO: Split all this crap into multiple files? -->
+
 <template lang="pug">
 	div
 		nav.navbar.is-fixed-top
@@ -33,29 +35,32 @@
 					h2.subtitle
 						| Click on a picture to view it in full.
 						br
-						| Log in to vote, and perform administrative actions (soon)
+						| Log in to vote for your favorite pictures!
+						br
+						| (soon admins will be able to manage loading screens)
 
 		section.section
 			my-justified-grid(v-if="screenshots.length > 0" ref="grid")
 				my-justified-grid-item(v-for="screenshot in sortedScreenshots")
-					img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)")
+					img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)" :class="{ 'blurry': notifications[screenshot.id] && notifications[screenshot.id].message }")
+					.message {{ notifications[screenshot.id] ? notifications[screenshot.id].message : "" }}
 					.details
 						.votes
-							a.upvotes.has-text-success
+							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'up')" :class="{ 'has-voted': getOwnVote(screenshot.id) == true }").upvotes.has-text-success
 								i.material-icons.md-light thumb_up
 								span {{ screenshot.up }}
-							a.downvotes.has-text-danger
+							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'down')" :class="{ 'has-voted': getOwnVote(screenshot.id) == false }").downvotes.has-text-danger
 								i.material-icons.md-light thumb_down
 								span {{ screenshot.down }}
 						a.is-dark(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
 						p(v-else) {{ screenshot.name }}
-
 			.google-loading(v-else)
 				Loading
 </template>
 
 <script>
 
+import Vue from "vue"
 import MyJustifiedGrid from "@/components/MyJustifiedGrid.vue"
 import MyJustifiedGridItem from "@/components/MyJustifiedGridItem.vue"
 import Loading from "@/components/Loading.vue"
@@ -63,6 +68,12 @@ import Loading from "@/components/Loading.vue"
 import axios from "axios"
 import wilson from "wilson-score-interval"
 import SteamID from "steamid"
+
+axios.defaults.withCredentials = true
+
+function getUrlParamsString(obj) {
+	return new URLSearchParams(obj).toString()
+}
 
 export default {
 	components: {
@@ -75,7 +86,9 @@ export default {
 			dropdowns: [ false ],
 			burger: false,
 
+			notifications: [],
 			screenshots: [],
+			myVotes: [],
 
 			sortMethods: [ "ID", "Rating", "Last added", "Author" ],
 			sortMethod: 1,
@@ -86,54 +99,52 @@ export default {
 		}
 	},
 	mounted() {
-		axios.get("https://g2cf.metastruct.net/lsapi")
+		axios.get("http://g2.metastruct.net:2095/lsapi") // Uncached
 			.then(res => {
 				this.screenshots = res.data.result
-
-				console.log("Got screenshots", {...res.data.result})
 			})
 
-		axios.get("https://g2cf.metastruct.net/lsapi/auth", { withCredentials: true })
+		axios.post("https://g2cf.metastruct.net/lsapi/auth")
 			.then(res => {
-				this.authed = res.data
+				if (res.data && res.data.success) {
+					this.authed = res.data
+
+					axios.get("https://g2cf.metastruct.net/lsapi/myvotes")
+						.then(res => {
+							if (res.data && res.data.success) {
+								this.myVotes = res.data.votes
+							}
+						})
+				}
+			})
+			.catch((err) => {
+				if (!err.response || err.response.status != 401) console.error(err)
 			})
 	},
 	computed: {
 		sortedScreenshots() {
-			let sorted;
-
-			// I can probably shorten this
-			switch (this.sortMethod) {
-				case 0: // ID
-					sorted = this.screenshots.sort((a, b) => {
+			let sorted = this.screenshots.sort((a, b) => {
+				switch (this.sortMethod) {
+					default:
+					case 0: // ID
 						return a.id > b.id
-					})
-					break
-				case 1: // Rating
-					sorted = this.screenshots.sort((a, b) => {
+					case 1: // Rating
 						let aWilson = wilson(a.up, a.up + a.down).left
 						let bWilson = wilson(b.up, b.up + b.down).left
 
 						if (aWilson == bWilson) return a.id > b.id
 						else return aWilson > bWilson
-					})
-					break
-				case 2: // Last added
-					sorted = this.screenshots.sort((a, b) => {
+					case 2: // Last added
 						if (a.created == b.created) return a.id > b.id
 						else return a.created > b.created
-					})
-					break
-				case 3: // Author
-					sorted = this.screenshots.sort((a, b) => {
+					case 3: // Author
 						let aName = a.name.toLowerCase()
 						let bName = b.name.toLowerCase()
 
 						if (aName == bName) return a.id > b.id
 						else return aName > bName
-					})
-					break
-			}
+					}
+			})
 
 			if (sorted) {
 				if (this.sortMethodReverse) sorted = sorted.reverse()
@@ -166,6 +177,48 @@ export default {
 		getProfileURL(approver) {
 			return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(approver).getSteamID64()
 		},
+		vote(id, dir) {
+			let params = getUrlParamsString({ csrf_token: this.authed.csrf_token })
+			axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
+				.then(res => {
+					if (!res.data.errors) {
+						// Display toast
+						// TODO: Actually change counter?? I can't be assed right now
+
+						let msg
+						switch (dir) {
+							case "up":
+							case "down":
+								msg = dir + "voted!"
+								break
+							case "delete":
+								msg = "vote removed!"
+								break
+						}
+						let notify = this.notifications[id] || {}
+						Vue.set(this.notifications, id, notify)
+						Vue.set(notify, "message", msg)
+						if (notify.timeout) clearTimeout(notify.timeout)
+						notify.timeout = setTimeout(() => {
+							Vue.set(notify, "message", "")
+						}, 3000)
+					} else throw Error(res.data.errors.join("\n"))
+				})
+				.catch(err => {
+					if (err.response && err.response.status == 304 && dir != "delete") {
+						// Already voted, let's delete it
+						this.vote(id, "delete")
+					} else {
+						console.error(err)
+					}
+				})
+		},
+		getOwnVote(id) {
+			if (!Array.isArray(this.myVotes)) return null
+
+			let vote = this.myVotes ? this.myVotes.find(x => x[0] == id) : null
+			return vote ? vote[1] : null
+		}
 		/* Python exposed the name for us
 		getAuthorName(accountID) {
 
@@ -189,10 +242,41 @@ nav.navbar {
 .grid-item {
 	cursor: pointer;
 	overflow: hidden;
+	position: relative;
+
+	img {
+		transition: filter 0.33s ease-out;
+		filter: blur(0px);
+
+		&.blurry { // Had to do this via JS sadly
+			filter: blur(4px);
+		}
+	}
+
+	.message {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		opacity: 1;
+		transition: opacity 0.33s ease-in;
+		color: white;
+		font-size: 2em;
+
+		&:empty {
+			opacity: 0;
+		}
+	}
 
 	.details {
 		display: block;
-		position: relative;
+		position: absolute;
 		text-align: left;
 		padding: 4px 8px;
 		bottom: 0;
@@ -200,7 +284,7 @@ nav.navbar {
 		width: 100%;
 		background: rgba(0, 0, 0, 0.5);
 
-		transform: translateY(0%);
+		transform: translateY(100%);
 		transform-origin: center bottom;
 		opacity: 0;
 
@@ -210,21 +294,25 @@ nav.navbar {
 			float: right;
 
 			.upvotes, .downvotes {
-				margin: 0 4px;
-
 				display: inline-flex;
 				align-content: center;
+
+				margin: 0 4px;
 
 				span {
 					margin: 0 4px;
 				}
+			}
+
+			.downvotes.has-voted ~ .upvotes:not(.has-voted), .upvotes.has-voted ~ .downvotes:not(.has-voted) {
+				filter: grayscale(50%) brightness(75%);
 			}
 		}
 	}
 
 	&:hover {
 		.details {
-			transform: translateY(-100%);
+			transform: translateY(0%);
 			opacity: 1;
 		}
 	}
