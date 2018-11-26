@@ -8,8 +8,9 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
-    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup"
+    "generate": "rmdir /s /q dist & nuxt generate",
+    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup",
+    "gh-pages": "yarn run generate & yarn run deploy"
   },
   "dependencies": {
     "@mdi/font": "^3.0.39",
