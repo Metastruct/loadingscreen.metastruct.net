@@ -4,15 +4,23 @@
 			.navbar-brand
 				a(href="https://metastruct.net")
 					img.navbar-item(src="@/assets/logo.png")
-				.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
-					a.navbar-link(@click="toggleDropdown(0)") Sort by
-					.navbar-dropdown
-						a.navbar-item(v-for="(name, k) in sortMethods" @click="sortMethod = k" :class="{ 'is-active': sortMethod == k }") {{ name }}
-						hr.navbar-divider
-						a.navbar-item(@click="sortMethodReverse = false" :class="{ 'is-active': sortMethodReverse == false }") Ascending
-						a.navbar-item(@click="sortMethodReverse = true" :class="{ 'is-active': sortMethodReverse == true }") Descending
-				.navbar-item
-					input.input(type="text" placeholder="Filter by author" v-model="authorSearch")
+			.navbar-menu
+				.navbar-start
+					.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
+						a.navbar-link(@click="toggleDropdown(0)") Sort by
+						.navbar-dropdown
+							a.navbar-item(v-for="(name, k) in sortMethods" @click="sortMethod = k" :class="{ 'is-active': sortMethod == k }") {{ name }}
+							hr.navbar-divider
+							a.navbar-item(@click="sortMethodReverse = false" :class="{ 'is-active': sortMethodReverse == false }") Ascending
+							a.navbar-item(@click="sortMethodReverse = true" :class="{ 'is-active': sortMethodReverse == true }") Descending
+					.navbar-item
+						input.input(type="text" placeholder="Filter by author" v-model="authorSearch")
+				.navbar-end
+					a.navbar-item(v-if="!authed" href="https://g2cf.metastruct.net/lsapi/login")
+						i.material-icons.md-light person
+						span &nbsp;Login
+					.navbar-item(v-else)
+						span Logged in
 
 		section.hero.is-small.is-primary.is-bold
 			.hero-body
@@ -21,7 +29,7 @@
 					h2.subtitle
 						| Click on a picture to view it in full.
 						br
-						| Log in to vote, and perform administrative actions
+						| Log in to vote, and perform administrative actions (soon)
 
 		section.section
 			my-justified-grid(v-if="screenshots.length > 0" ref="grid")
@@ -68,7 +76,8 @@ export default {
 			sortMethod: 0,
 			sortMethodReverse: false,
 
-			authorSearch: ""
+			authorSearch: "",
+			authed: null
 		}
 	},
 	mounted() {
@@ -78,11 +87,17 @@ export default {
 
 				console.log("Got screenshots", {...res.data.result})
 			})
+
+		axios.get("https://g2cf.metastruct.net/lsapi/auth")
+			.then(res => {
+				this.authed = res.data
+			})
 	},
 	computed: {
 		sortedScreenshots() {
 			let sorted;
 
+			// I can probably shorten this
 			switch (this.sortMethod) {
 				case 0: // ID
 					sorted = this.screenshots.sort((a, b) => {
@@ -91,12 +106,17 @@ export default {
 					break
 				case 1: // Rating
 					sorted = this.screenshots.sort((a, b) => {
-						return wilson(a.up, a.up + a.down).left > wilson(b.up, b.up + b.down)
+						let aWilson = wilson(a.up, a.up + a.down).left
+						let bWilson = wilson(b.up, b.up + b.down).left
+
+						if (aWilson == bWilson) return a.id > b.id
+						else return aWilson > bWilson
 					})
 					break
 				case 2: // Last added
 					sorted = this.screenshots.sort((a, b) => {
-						return a.created > b.created
+						if (a.created == b.created) return a.id > b.id
+						else return a.created > b.created
 					})
 					break
 				case 3: // Author
