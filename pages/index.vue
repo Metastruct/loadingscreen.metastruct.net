@@ -73,8 +73,8 @@ export default {
 			screenshots: [],
 
 			sortMethods: [ "ID", "Rating", "Last added", "Author" ],
-			sortMethod: 0,
-			sortMethodReverse: false,
+			sortMethod: 1,
+			sortMethodReverse: true,
 
 			authorSearch: "",
 			authed: null
