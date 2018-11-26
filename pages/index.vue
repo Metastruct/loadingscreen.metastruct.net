@@ -93,7 +93,7 @@ export default {
 				console.log("Got screenshots", {...res.data.result})
 			})
 
-		axios.get("https://g2cf.metastruct.net/lsapi/auth")
+		axios.get("https://g2cf.metastruct.net/lsapi/auth", { withCredentials: true })
 			.then(res => {
 				this.authed = res.data
 			})
