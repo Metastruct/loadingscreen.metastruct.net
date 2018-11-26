@@ -4,7 +4,11 @@
 			.navbar-brand
 				a(href="https://metastruct.net")
 					img.navbar-item(src="@/assets/logo.png")
-			.navbar-menu
+				a.navbar-burger.has-text-white(@click="burger = !burger" :class="{ 'is-active': burger }")
+					span
+					span
+					span
+			.navbar-menu(:class="{ 'is-active': burger }")
 				.navbar-start
 					.navbar-item.has-dropdown(:class="{ 'is-active': dropdowns[0] }")
 						a.navbar-link(@click="toggleDropdown(0)") Sort by
@@ -16,7 +20,7 @@
 					.navbar-item
 						input.input(type="text" placeholder="Filter by author" v-model="authorSearch")
 				.navbar-end
-					a.navbar-item(v-if="!authed" href="https://g2cf.metastruct.net/lsapi/login")
+					a.navbar-item(v-if="!authed" href="https://g2cf.metastruct.net/lsapi/login" style="display: flex;")
 						i.material-icons.md-light person
 						span &nbsp;Login
 					.navbar-item(v-else)
@@ -69,6 +73,7 @@ export default {
 	data() {
 		return {
 			dropdowns: [ false ],
+			burger: false,
 
 			screenshots: [],
 
