@@ -8,8 +8,8 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "rmdir /s /q dist & nuxt generate",
-    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup",
+    "generate": "bash rm -r dist & nuxt generate",
+    "deploy": "bash deploy.sh",
     "gh-pages": "yarn run generate & yarn run deploy"
   },
   "dependencies": {
