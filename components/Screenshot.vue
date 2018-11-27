@@ -78,8 +78,10 @@ export default {
 		},
 		getOwnVote(id) {
 			if (!this.$store.state.myVotes.success) return null
+			let upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id)
+			let downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id)
 
-			return this.$store.state.myVotes.up.includes(id) || (this.$store.state.myVotes.down.includes(id) ? false : null)
+			return upvoted || downvoted ? false : null)
 		}
     },
 }
