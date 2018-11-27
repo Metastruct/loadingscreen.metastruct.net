@@ -46,10 +46,10 @@
 					.message {{ notifications[screenshot.id] ? notifications[screenshot.id].message : "" }}
 					.details
 						.votes
-							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'up')" :class="{ 'has-voted': getOwnVote(screenshot.id) == true }").upvotes.has-text-success
+							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'up')" :class="{ 'unvoted': getOwnVote(screenshot.id) == false }").upvotes.has-text-success
 								i.material-icons.md-light thumb_up
 								span {{ screenshot.up }}
-							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'down')" :class="{ 'has-voted': getOwnVote(screenshot.id) == false }").downvotes.has-text-danger
+							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'down')" :class="{ 'unvoted': getOwnVote(screenshot.id) == true }").downvotes.has-text-danger
 								i.material-icons.md-light thumb_down
 								span {{ screenshot.down }}
 						a.has-text-primary(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
@@ -217,7 +217,7 @@ export default {
 		getOwnVote(id) {
 			if (!this.myVotes.success) return null
 
-			return this.myVotes.up.includes(id) || this.myVotes.down.includes(id) ? false : null
+			return this.myVotes.up.includes(id) || (this.myVotes.down.includes(id) ? false : null)
 		}
 		/* Python exposed the name for us
 		getAuthorName(accountID) {
@@ -302,10 +302,10 @@ nav.navbar {
 				span {
 					margin: 0 4px;
 				}
-			}
 
-			.downvotes.has-voted ~ .upvotes:not(.has-voted), .upvotes.has-voted ~ .downvotes:not(.has-voted) {
-				filter: grayscale(50%) brightness(75%);
+				&.unvoted {
+					filter: grayscale(50%) brightness(75%);
+				}
 			}
 		}
 	}
