@@ -217,7 +217,7 @@ export default {
 		getOwnVote(id) {
 			if (!this.myVotes.success) return null
 
-			return this.myVotes.up.includes(id) || this.myVotes.down.includes(id) || null
+			return this.myVotes.up.includes(id) || this.myVotes.down.includes(id) ? false : null
 		}
 		/* Python exposed the name for us
 		getAuthorName(accountID) {
