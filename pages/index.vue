@@ -99,7 +99,7 @@ export default {
 		}
 	},
 	mounted() {
-		axios.get("http://g2.metastruct.net:2095/lsapi") // Uncached
+		axios.get("https://g2cf.metastruct.net/lsapi")
 			.then(res => {
 				this.screenshots = res.data.result
 			})
