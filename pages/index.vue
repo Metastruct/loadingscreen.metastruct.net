@@ -42,7 +42,7 @@
 		section.section
 			my-justified-grid(v-if="screenshots.length > 0" ref="grid")
 				my-justified-grid-item(v-for="screenshot in sortedScreenshots")
-					img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot('http://' + screenshot.url)" :class="{ 'blurry': notifications[screenshot.id] && notifications[screenshot.id].message }")
+					img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot(screenshot.url)" :class="{ 'blurry': notifications[screenshot.id] && notifications[screenshot.id].message }")
 					.message {{ notifications[screenshot.id] ? notifications[screenshot.id].message : "" }}
 					.details
 						.votes
@@ -52,7 +52,7 @@
 							component(:is="authed ? 'a' : 'div'" @click="vote(screenshot.id, 'down')" :class="{ 'has-voted': getOwnVote(screenshot.id) == false }").downvotes.has-text-danger
 								i.material-icons.md-light thumb_down
 								span {{ screenshot.down }}
-						a.is-dark(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
+						a.has-text-primary(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
 						p(v-else) {{ screenshot.name }}
 			.google-loading(v-else)
 				Loading
@@ -172,6 +172,7 @@ export default {
 			this.$set(this.dropdowns, id, !this.dropdowns[id])
 		},
 		viewScreenshot(url) {
+			if (!url.match(/^https?:\/\//i)) url = "http://" + url
 			window.open(url, "_blank")
 		},
 		getProfileURL(approver) {

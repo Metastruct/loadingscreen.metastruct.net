@@ -4,7 +4,8 @@
 $body-background-color: #222222;
 $background: #222222;
 $text: #e4e4e4;
-$link: #0ce3ac;
+$primary: #0ce3ac;
+$link: $primary;
 
 $navbar-background-color: lighten(#222222, 7.5%);
 $navbar-item-color: $text;
