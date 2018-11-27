@@ -112,7 +112,7 @@ export default {
 					axios.get("https://g2cf.metastruct.net/lsapi/myvotes")
 						.then(res => {
 							if (res.data && res.data.success) {
-								this.myVotes = res.data.votes
+								this.myVotes = res.data
 							}
 						})
 				}
@@ -215,10 +215,9 @@ export default {
 				})
 		},
 		getOwnVote(id) {
-			if (!Array.isArray(this.myVotes)) return null
+			if (!this.myVotes.success) return null
 
-			let vote = this.myVotes ? this.myVotes.find(x => x[0] == id) : null
-			return vote ? vote[1] : null
+			return this.myVotes.up.includes(id) || this.myVotes.down.includes(id) || null
 		}
 		/* Python exposed the name for us
 		getAuthorName(accountID) {
