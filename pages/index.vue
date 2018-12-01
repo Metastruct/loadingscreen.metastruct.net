@@ -18,7 +18,7 @@
                 p.menu-label.has-text-primary Filter by
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") ID
                 .control
-                    input.input(type="number" @input="pushQuery({ id: $event.target.value })")
+                    input.input(type="number" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Author
                 input.input(type="text" placeholder="Author" v-model="filterAuthor")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Status
@@ -28,10 +28,13 @@
                         | {{ filter.name }}
                 p.menu-label.has-text-primary Actions
                 ul.menu-list
-                    a(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login" style="display: flex;")
-                        i.material-icons.md-light person
+                    a.is-flex(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login")
+                        i.material-icons person
                         p &nbsp;Login
-                    p(v-else) Logged in!
+                    template(v-if="$store.state.authed.success")
+                        a.is-flex(@click="submit")
+                            i.material-icons add_to_queue
+                            p &nbsp;Submit new image
             button.collapse-button(@click="toggleSidebar")
                 i.material-icons.md-light(v-if="!sidebar") keyboard_arrow_right
                 i.material-icons.md-light(v-else) keyboard_arrow_left
@@ -92,6 +95,10 @@ function defaultSort(a, b) {
     else return statusOrder[a.approval] > statusOrder[b.approval]
 }
 
+function getUrlParamsString(obj) {
+    return new URLSearchParams(obj).toString()
+}
+
 export default {
     components: {
         ScreenshotGrid,
@@ -112,6 +119,35 @@ export default {
         },
         toggleSidebar() {
             this.sidebar = !this.sidebar
+        },
+        submit() {
+            let url = prompt("Enter the direct URL to the image you want to submit\nSupported hosts: Steam Community, imgur", "")
+
+            if (url) {
+                let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token, url })
+                axios.post(`https://g2cf.metastruct.net/lsapi?${params}`)
+                    .then(res => {
+                        alert("URL submitted for review with ID " + res.data.id + "! Please check back later to see it in the list.\n(you should probably try sorting by last added, descending)")
+                    })
+                    .catch(err => {
+                        if (err.response) {
+                            switch (err.response.status) {
+                                case 400:
+                                    alert(err.response.data.reason)
+                                    break
+                                case 429:
+                                    alert("You have been rate limited!")
+                                    break
+                                case 409:
+                                    alert("URL is already in the database!")
+                                    window.location.href = location.origin = "/?id=" + err.response.data.id
+                                    break
+                            }
+                        }
+
+                        console.error(err)
+                    })
+            }
         }
     },
     mounted() {
@@ -240,7 +276,7 @@ export default {
         overflow: auto;
         padding: 1rem;
         background: lighten($background, 7.5%);
-        max-width: 15rem;
+        max-width: 16.66rem;
         width: 100%;
         height: 100%;
         box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);

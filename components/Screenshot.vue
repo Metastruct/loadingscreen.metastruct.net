@@ -14,10 +14,10 @@
             a.has-text-primary(v-if="screenshot.accountid != 0" :href="profileURL" target="_blank" title="Author") {{ screenshot.name }}
             p(v-else title="Author") {{ screenshot.name }}
         .status(:class="{ pending: screenshot.approval == null, denied: screenshot.approval == false, approved: screenshot.approval == true }" title="Status")
+            p.has-text-light {{ timestamp }}
             p(v-if="screenshot.approval == null") Pending
             p(v-else-if="screenshot.approval == false") Denied
             p(v-else-if="screenshot.approval == true") Approved
-            p.has-text-light {{ timestamp }}
             .judge
                 template(v-if="$store.state.authed.admin")
                     a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
@@ -45,7 +45,8 @@ export default {
         return {
             isVisible: false,
             message: "",
-            timeout: null
+            timeout: null,
+            previous: null
         }
     },
     computed: {
@@ -89,24 +90,30 @@ export default {
             axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
                 .then(res => {
                     if (!res.data.errors) {
-                        // Display toast
-                        // TODO: Actually change counter?? I can't be assed right now
-
                         switch (dir) {
                             case "up":
                             case "down":
                                 this.setMessage(dir + "voted!")
+                                this.screenshot[dir]++
+                                console.log(dir, this.previous)
+                                if (!this.previous && this.getOwnVote() != null) {
+                                    this.screenshot[this.getOwnVote() ? "up" : "down"]--
+                                } else if (this.previous && this.previous != dir) {
+                                    this.screenshot[this.previous]--
+                                }
                                 break
                             case "delete":
                                 this.setMessage("vote removed!")
                                 break
                         }
+                        this.previous = dir
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => {
                     if (err.response && err.response.status == 304 && dir != "delete") {
                         // Already voted, let's delete it
                         this.vote(id, "delete")
+                        if (this.previous != "delete") this.screenshot[dir]--
                     } else {
                         console.error(err)
                     }
@@ -120,17 +127,32 @@ export default {
                         switch (dir) {
                             case "approve":
                                 this.setMessage("approved!")
+                                this.screenshot.approval = true
                                 break
                             case "deny":
                                 this.setMessage("denied!")
+                                this.screenshot.approval = false
                                 break
                         }
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => console.error(err))
         },
-        getOwnVote(id) {
+        getOwnVote() {
             if (!this.$store.state.myVotes.success) return null
+
+            if (this.previous != null) {
+                switch (this.previous) {
+                    case "up":
+                        return true
+                    case "down":
+                        return false
+                    case "delete":
+                        return null
+                }
+            }
+
+            let id = this.screenshot.id
             let upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id)
             let downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id)
 
