@@ -1,6 +1,6 @@
 <template lang="pug">
     .screenshot-grid
-        screenshot(v-for="screenshot in screenshots" :screenshot="screenshot")
+        screenshot(v-for="screenshot in screenshots" :screenshot="screenshot" :key="screenshot.id")
 </template>
 
 <script>

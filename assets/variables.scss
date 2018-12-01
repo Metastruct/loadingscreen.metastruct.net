@@ -3,12 +3,19 @@
 // https://bulma.io/documentation/customize/variables/
 
 // Base
-$body-background-color: #222222;
-$background: #222222;
 $text: #e4e4e4;
 $text-light: #aaaaaa;
+$text-strong: #fff;
 $primary: #0ce3ac;
+
+$body-color: $text;
+$body-background-color: #222222;
+$background: #222222;
+
 $link: $primary;
+$link-hover: darken($primary, 7.5%);
+
+$input-hover-color: $text-strong;
 
 // Navbar (unused?)
 $navbar-background-color: lighten($background, 7.5%);

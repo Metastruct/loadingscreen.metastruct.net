@@ -1,18 +1,33 @@
 <template lang="pug">
     .screenshot(v-observe-visibility="visibilityChanged")
-        a(:href="getScreenshotURL(screenshot.url)" target="_blank")
+        a(:href="screenshotURL" target="_blank")
             img(v-if="isVisible" :src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" :class="{ blurry: message }")
         .message {{ message }}
         .details
             .votes
-                component.upvotes.has-text-success(:is="$store.state.authed ? 'a' : 'div'" @click="vote(screenshot.id, 'up')" :class="{ unvoted: getOwnVote(screenshot.id) == false }")
-                    i.material-icons.md-light thumb_up
-                    span {{ screenshot.up }}
-                component.downvotes.has-text-danger(:is="$store.state.authed ? 'a' : 'div'" @click="vote(screenshot.id, 'down')" :class="{ unvoted: getOwnVote(screenshot.id) == true }")
-                    i.material-icons.md-light thumb_down
-                    span {{ screenshot.down }}
-            a.has-text-primary(v-if="screenshot.accountid != 0" :href="getProfileURL(screenshot.accountid)" target="_blank") {{ screenshot.name }}
-            p(v-else) {{ screenshot.name }}
+                a.upvotes.has-text-success(@click="vote(screenshot.id, 'up')" :class="{ unvoted: getOwnVote(screenshot.id) == false }" title="Upvote")
+                    i.material-icons thumb_up
+                    p {{ screenshot.up }}
+                a.downvotes.has-text-danger(@click="vote(screenshot.id, 'down')" :class="{ unvoted: getOwnVote(screenshot.id) == true }" title="Downvote")
+                    i.material-icons thumb_down
+                    p {{ screenshot.down }}
+            a.has-text-primary(v-if="screenshot.accountid != 0" :href="profileURL" target="_blank" title="Author") {{ screenshot.name }}
+            p(v-else title="Author") {{ screenshot.name }}
+        .status(:class="{ pending: screenshot.approval == null, denied: screenshot.approval == false, approved: screenshot.approval == true }" title="Status")
+            p(v-if="screenshot.approval == null") Pending
+            p(v-else-if="screenshot.approval == false") Denied
+            p(v-else-if="screenshot.approval == true") Approved
+            p.has-text-light {{ timestamp }}
+            .judge
+                template(v-if="$store.state.authed.admin")
+                    a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
+                        i.material-icons done
+                    a.has-text-danger(title="Deny" @click="setApproved(screenshot.id, 'deny')")
+                        i.material-icons clear
+                a.has-text-light(v-clipboard:copy="getGalleryURL()" v-clipboard:success="onCopyGalleryURL" title="Share")
+                    i.material-icons share
+
+
 </template>
 
 <script>
@@ -33,18 +48,43 @@ export default {
             timeout: null
         }
     },
+    computed: {
+        profileURL() {
+            return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(this.screenshot.accountid).getSteamID64()
+        },
+        screenshotURL() {
+            let url = this.screenshot.url
+            if (!url.match(/^https?:\/\//i)) url = "http://" + url
+            return url
+        },
+        timestamp() {
+            let date = new Date(this.screenshot.created * 1e3).toISOString().substring(0, 10)
+            return date
+        }
+    },
     methods: {
         visibilityChanged(isVisible) {
             this.isVisible = isVisible
         },
-        getScreenshotURL(url) {
-            if (!url.match(/^https?:\/\//i)) url = "http://" + url
-            return url
+        setMessage(msg) {
+            this.message = msg
+            if (this.timeout) clearTimeout(this.timeout)
+            this.timeout = setTimeout(() => {
+                this.message = ""
+            }, 3000)
         },
-        getProfileURL(accountID) {
-            return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(accountID).getSteamID64()
+        onCopyGalleryURL() {
+            this.setMessage("copied link to clipboard!")
+        },
+        getGalleryURL() {
+            return location.origin + "/?id=" + this.screenshot.id
         },
         vote(id, dir) {
+            if (!this.$store.state.authed.success) {
+                this.setMessage("log in to vote!")
+                return
+            }
+
             let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
             axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
                 .then(res => {
@@ -55,17 +95,12 @@ export default {
                         switch (dir) {
                             case "up":
                             case "down":
-                                this.message = dir + "voted!"
+                                this.setMessage(dir + "voted!")
                                 break
                             case "delete":
-                                this.message = "vote removed!"
+                                this.setMessage("vote removed!")
                                 break
                         }
-
-                        if (this.timeout) clearTimeout(this.timeout)
-                        this.timeout = setTimeout(() => {
-                            this.message = ""
-                        }, 3000)
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => {
@@ -76,6 +111,23 @@ export default {
                         console.error(err)
                     }
                 })
+        },
+        setApproved(id, dir) {
+            let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
+            axios.post(`https://g2cf.metastruct.net/lsapi/${dir}/${id}?${params}`)
+                .then(res => {
+                    if (!res.data.errors) {
+                        switch (dir) {
+                            case "approve":
+                                this.setMessage("approved!")
+                                break
+                            case "deny":
+                                this.setMessage("denied!")
+                                break
+                        }
+                    } else throw Error(res.data.errors.join("\n"))
+                })
+                .catch(err => console.error(err))
         },
         getOwnVote(id) {
             if (!this.$store.state.myVotes.success) return null
@@ -176,9 +228,9 @@ $height: 216px;
                 align-content: center;
                 align-items: center;
 
-                margin: 0 4px;
+                margin-right: 8px;
 
-                span {
+                p {
                     margin: 0 4px;
                 }
 
@@ -189,15 +241,61 @@ $height: 216px;
         }
     }
 
+    .status {
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        align-items: center;
+        position: absolute;
+        text-align: left;
+        padding: 6px 6px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
+
+        &.denied {
+            color: $danger;
+        }
+        &.approved {
+            color: $success;
+        }
+        &.pending {
+            color: $warning;
+        }
+
+        transform: translateY(-100%);
+        transform-origin: center top;
+        opacity: 0;
+
+        transition: transform 0.25s ease-in, opacity 0.25s ease-in;
+
+        p {
+            text-transform: uppercase;
+        }
+
+        .judge {
+            display: flex;
+            align-content: center;
+            align-items: center;
+
+            a {
+                display: inline-flex;
+                align-content: center;
+                align-items: center;
+            }
+        }
+    }
+
     @media screen and (max-width: 768px) {
-        .details {
+        .details, .status {
             transform: translateY(0%);
             opacity: 1;
         }
     }
 
     &:hover {
-        .details {
+        .details, .status {
             transform: translateY(0%);
             opacity: 1;
         }

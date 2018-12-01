@@ -25,6 +25,7 @@
     "push-dir": "^0.4.1",
     "sass-loader": "^7.1.0",
     "steamid": "^1.1.0",
+    "vue-clipboard2": "^0.2.1",
     "vue-observe-visibility": "^0.4.3",
     "wilson-score-interval": "^2.0.1",
     "xml-js": "^1.6.8"
