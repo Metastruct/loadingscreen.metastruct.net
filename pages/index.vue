@@ -53,7 +53,7 @@
                             br
                             a(href="https://g2cf.metastruct.net/lsapi/login") Log in with Steam
                             |
-                            | in order to vote for your favorite screenshots!
+                            | in order to vote for your favorite screenshots, submit your own, and as a <b>developer</b>, manage screenshots submitted by other users by approving or denying them.
                             br
                             | You can use the
                             |
@@ -61,9 +61,7 @@
                             |
                             | to sort and filter the grid to your convenience.
                         p
-                            b Developers
-                            |
-                            | can approve and deny screenshots to be showcased. If you think your screenshots should be approved, make sure to get a lot of ratings!
+                            | If you think your screenshots should be approved, make sure to get a lot of ratings!
 
 
         section.section
