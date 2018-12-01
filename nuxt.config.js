@@ -16,9 +16,7 @@ module.exports = {
     link: [
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
     ],
-    bodyAttrs: {
-      class: "has-navbar-fixed-top"
-    }
+    bodyAttrs: {}
   },
 
   /*

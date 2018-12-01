@@ -2,40 +2,39 @@
 
 <template lang="pug">
 	div
-		nav.navbar.is-fixed-top
-			.navbar-brand
+		aside.sidebar(:class="{ 'is-expanded': showSidebar }")
+			.sidebar-background(@click="showSidebar = !showSidebar")
+			.menu
 				a(href="https://metastruct.net")
-					img.navbar-item(src="@/assets/logo.png")
-				a.navbar-burger.has-text-white(@click="burger = !burger" :class="{ 'is-active': burger }")
-					span
-					span
-					span
-			.navbar-menu(:class="{ 'is-active': burger }")
-				.navbar-start
-					.navbar-item.has-dropdown.is-hoverable
-						a.navbar-link Sort by
-						.navbar-dropdown
-							nuxt-link.navbar-item(v-for="(name, k) in sortMethods" :to="{ path: $route.path, query: { sortBy: k, reverse: sortMethodReverse } }" :class="{ 'is-active': sortMethod == k }") {{ name }}
-							hr.navbar-divider
-							nuxt-link.navbar-item(:to="{ path: $route.path, query: { sortBy: sortMethod, reverse: false } }" :class="{ 'is-active': sortMethodReverse == false }") Ascending
-							nuxt-link.navbar-item(:to="{ path: $route.path, query: { sortBy: sortMethod, reverse: true } }" :class="{ 'is-active': sortMethodReverse == true }") Descending
-					.navbar-item
-						input.input(type="text" placeholder="Filter by author" v-model="authorSearch")
-				.navbar-end
-					a.navbar-item(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login" style="display: flex;")
+					img(src="@/assets/logo.png")
+				p.menu-label Sort by
+				ul.menu-list
+					nuxt-link(v-for="(name, k) in sortMethods" :to="{ path: $route.path, query: { sortBy: k, reverse: sortMethodReverse } }" :class="{ 'is-active': sortMethod == k }") {{ name }}
+					// hr.navbar-divider
+				p.menu-label Order
+				ul.menu-list
+					nuxt-link(:to="{ path: $route.path, query: { sortBy: sortMethod, reverse: false } }" :class="{ 'is-active': sortMethodReverse == false }") Ascending
+					nuxt-link(:to="{ path: $route.path, query: { sortBy: sortMethod, reverse: true } }" :class="{ 'is-active': sortMethodReverse == true }") Descending
+				p.menu-label Filtering
+				input.input(type="text" placeholder="Author" v-model="authorSearch")
+				p.menu-label Actions
+				ul.menu-list
+					a(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login" style="display: flex;")
 						i.material-icons.md-light person
 						span &nbsp;Login
-					.navbar-item(v-else)
-						span Logged in
+					span(v-else) Logged in!
+			button.collapse-button(@click="showSidebar = !showSidebar")
+				i.material-icons.md-light(v-if="!showSidebar") keyboard_arrow_right
+				i.material-icons.md-light(v-else) keyboard_arrow_left
 
 		section.hero.is-small.is-primary.is-bold
 			.hero-body
 				.container
-					h1.title Loading Screens
+					h1.title Metastruct Loading Screen Gallery
 					h2.subtitle
 						| Click on a picture to view it in full.
 						br
-						| Log in to vote for your favorite pictures!
+						| Log in with Steam to vote for your favorite pictures!
 						br
 						| (soon admins will be able to manage loading screens)
 
@@ -64,8 +63,7 @@ export default {
 	},
 	data() {
 		return {
-			dropdowns: [ false ],
-			burger: false,
+			showSidebar: false,
 
 			screenshots: [],
 
@@ -147,17 +145,6 @@ export default {
 				this.$forceUpdate()
 			})
 		},
-	},
-	methods: {
-		toggleDropdown(id) {
-			this.$set(this.dropdowns, id, !this.dropdowns[id])
-		},
-		/* Python exposed the name for us
-		getAuthorName(accountID) {
-
-			axios.get("")
-		}
-		*/
 	}
 }
 
@@ -165,10 +152,72 @@ export default {
 
 <style lang="scss">
 
-nav.navbar {
-	img.navbar-item {
-		padding: 0;
-		height: 3.25rem;
+@import "@/assets/variables.scss";
+
+.sidebar {
+	position: fixed;
+	display: flex;
+	align-items: flex-end;
+	pointer-events: none;
+	z-index: 3;
+	height: 100%;
+	transform: translateX(-100%);
+	transition: transform 0.25s ease-in;
+
+	.sidebar-background {
+		position: absolute;
+		display: block;
+		transition: background-color 0.25s ease-in;
+		height: 125vh;
+		width: 125vw;
+	}
+
+	.menu {
+		position: relative;
+		overflow: auto;
+		padding: 1rem;
+		background: lighten($background, 7.5%);
+		max-width: 15rem;
+		width: 100%;
+		height: 100%;
+		box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);
+	}
+
+	button.collapse-button {
+		pointer-events: all;
+		position: absolute;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: lighten($background, 7.5%);
+		height: 3.5rem;
+		width: 3.5rem;
+		bottom: 1.5rem;
+		right: -1.5rem;
+		transform: translateX(100%);
+		border: none;
+		border-radius: 50%;
+		color: $text;
+		box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);
+		transition: filter 0.05s ease-in;
+
+		i {
+			font-size: 2rem;
+		}
+
+		&:active {
+			filter: brightness(87.5%);
+			padding: 0;
+		}
+	}
+
+	&.is-expanded {
+		pointer-events: all;
+		transform: translateX(0%);
+
+		.sidebar-background {
+			background: rgba(0, 0, 0, 0.5);
+		}
 	}
 }
 

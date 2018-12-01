@@ -1,6 +1,7 @@
 <template lang="pug">
     .screenshot(v-observe-visibility="visibilityChanged")
-        img(v-if="isVisible" :src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" @click="viewScreenshot(screenshot.url)" :class="{ blurry: message }")
+        a(:href="getScreenshotURL(screenshot.url)" target="_blank")
+            img(v-if="isVisible" :src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" :class="{ blurry: message }")
         .message {{ message }}
         .details
             .votes
@@ -20,7 +21,7 @@ import axios from "axios"
 import SteamID from "steamid"
 
 function getUrlParamsString(obj) {
-	return new URLSearchParams(obj).toString()
+    return new URLSearchParams(obj).toString()
 }
 
 export default {
@@ -36,53 +37,53 @@ export default {
         visibilityChanged(isVisible) {
             this.isVisible = isVisible
         },
-		viewScreenshot(url) {
-			if (!url.match(/^https?:\/\//i)) url = "http://" + url
-			window.open(url, "_blank")
-		},
+        getScreenshotURL(url) {
+            if (!url.match(/^https?:\/\//i)) url = "http://" + url
+            return url
+        },
         getProfileURL(accountID) {
-			return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(accountID).getSteamID64()
-		},
-		vote(id, dir) {
-			let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
-			axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
-				.then(res => {
-					if (!res.data.errors) {
-						// Display toast
-						// TODO: Actually change counter?? I can't be assed right now
+            return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(accountID).getSteamID64()
+        },
+        vote(id, dir) {
+            let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
+            axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
+                .then(res => {
+                    if (!res.data.errors) {
+                        // Display toast
+                        // TODO: Actually change counter?? I can't be assed right now
 
-						switch (dir) {
-							case "up":
-							case "down":
-								this.message = dir + "voted!"
-								break
-							case "delete":
-								this.message = "vote removed!"
-								break
+                        switch (dir) {
+                            case "up":
+                            case "down":
+                                this.message = dir + "voted!"
+                                break
+                            case "delete":
+                                this.message = "vote removed!"
+                                break
                         }
 
-						if (this.timeout) clearTimeout(this.timeout)
-						this.timeout = setTimeout(() => {
-							this.message = ""
-						}, 3000)
-					} else throw Error(res.data.errors.join("\n"))
-				})
-				.catch(err => {
-					if (err.response && err.response.status == 304 && dir != "delete") {
-						// Already voted, let's delete it
-						this.vote(id, "delete")
-					} else {
-						console.error(err)
-					}
-				})
-		},
-		getOwnVote(id) {
-			if (!this.$store.state.myVotes.success) return null
-			let upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id)
-			let downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id)
+                        if (this.timeout) clearTimeout(this.timeout)
+                        this.timeout = setTimeout(() => {
+                            this.message = ""
+                        }, 3000)
+                    } else throw Error(res.data.errors.join("\n"))
+                })
+                .catch(err => {
+                    if (err.response && err.response.status == 304 && dir != "delete") {
+                        // Already voted, let's delete it
+                        this.vote(id, "delete")
+                    } else {
+                        console.error(err)
+                    }
+                })
+        },
+        getOwnVote(id) {
+            if (!this.$store.state.myVotes.success) return null
+            let upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id)
+            let downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id)
 
-			return upvoted || (downvoted ? false : null)
-		}
+            return upvoted || (downvoted ? false : null)
+        }
     },
 }
 
@@ -113,82 +114,94 @@ $height: 216px;
         object-position: 50% 50%;
     }
 
-	cursor: pointer;
-	overflow: hidden;
-	position: relative;
+    overflow: hidden;
+    position: relative;
 
-	img {
-		transition: filter 0.33s ease-out;
-		filter: blur(0px);
+    img {
+        transition: filter 0.33s ease-out;
+        filter: blur(0px);
 
-		&.blurry { // Had to do this via JS sadly
-			filter: blur(4px);
-		}
-	}
+        &.blurry { // Had to do this via JS sadly
+            filter: blur(4px);
+        }
+    }
 
-	.message {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		pointer-events: none;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.5);
-		opacity: 1;
-		transition: opacity 0.33s ease-in;
-		color: white;
-		font-size: 2em;
+    .message {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 1;
+        transition: opacity 0.33s ease-in;
+        color: white;
+        font-size: 2em;
 
-		&:empty {
-			opacity: 0;
-		}
-	}
+        &:empty {
+            opacity: 0;
+        }
+    }
 
-	.details {
-		display: block;
-		position: absolute;
-		text-align: left;
-		padding: 4px 8px;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		background: rgba(0, 0, 0, 0.5);
+    .details {
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        align-items: center;
+        position: absolute;
+        text-align: left;
+        padding: 6px 6px;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
 
-		transform: translateY(100%);
-		transform-origin: center bottom;
-		opacity: 0;
+        transform: translateY(100%);
+        transform-origin: center bottom;
+        opacity: 0;
 
-		transition: transform 0.25s ease-in, opacity 0.25s ease-in;
+        transition: transform 0.25s ease-in, opacity 0.25s ease-in;
 
-		.votes {
-			float: right;
+        .votes {
+            display: flex;
+            align-content: center;
+            align-items: center;
 
-			.upvotes, .downvotes {
-				display: inline-flex;
-				align-content: center;
+            .upvotes, .downvotes {
+                display: inline-flex;
+                align-content: center;
+                align-items: center;
 
-				margin: 0 4px;
+                margin: 0 4px;
 
-				span {
-					margin: 0 4px;
-				}
+                span {
+                    margin: 0 4px;
+                }
 
-				&.unvoted {
-					filter: grayscale(50%) brightness(75%);
-				}
-			}
-		}
-	}
+                &.unvoted {
+                    filter: grayscale(50%) brightness(75%);
+                }
+            }
+        }
+    }
 
-	&:hover {
-		.details {
-			transform: translateY(0%);
-			opacity: 1;
-		}
-	}
+    @media screen and (max-width: 768px) {
+        .details {
+            transform: translateY(0%);
+            opacity: 1;
+        }
+    }
+
+    &:hover {
+        .details {
+            transform: translateY(0%);
+            opacity: 1;
+        }
+    }
 }
 
 </style>
