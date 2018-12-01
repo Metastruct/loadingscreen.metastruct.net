@@ -107,6 +107,7 @@ export default {
                                 break
                         }
                         this.previous = dir
+                        this.$nextTick(() => this.$forceUpdate())
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => {
@@ -134,6 +135,7 @@ export default {
                                 this.screenshot.approval = false
                                 break
                         }
+                        this.$nextTick(() => this.$forceUpdate())
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => console.error(err))
