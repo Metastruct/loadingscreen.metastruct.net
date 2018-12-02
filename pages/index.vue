@@ -18,7 +18,7 @@
                 p.menu-label.has-text-primary Filter by
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") ID
                 .control
-                    input.input(type="number" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
+                    input.input(type="text" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Author
                 input.input(type="text" placeholder="Author" v-model="filterAuthor")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Status
@@ -89,8 +89,8 @@ let statusOrder = {
     [false    ]: 3
 }
 function defaultSort(a, b) {
-    if (a.approval == b.approval) return a.id > b.id
-    else return statusOrder[a.approval] > statusOrder[b.approval]
+    if (a.approval == b.approval) return a.id > b.id ? 1 : -1
+    else return statusOrder[a.approval] > statusOrder[b.approval] ? 1 : -1
 }
 
 function getUrlParamsString(obj) {
@@ -174,7 +174,7 @@ export default {
     computed: {
         sortedScreenshots() {
             // Sort by
-            let sorted = this.screenshots.sort((a, b) => {
+            let sorted = this.screenshots.slice().sort((a, b) => {
                 switch (this.sortMethod) {
                     default:
                     case 0: // ID
@@ -184,17 +184,17 @@ export default {
                         let bWilson = wilson(b.up, b.up + b.down).left
 
                         if (aWilson == bWilson) return defaultSort(a, b)
-                        else return aWilson > bWilson
+                        else return aWilson > bWilson ? 1 : -1
                     case 2: // Last added
                         if (a.created == b.created) return defaultSort(a, b)
-                        else return a.created > b.created
+                        else return a.created > b.created ? 1 : -1
                     case 3: // Author
                         let aName = a.name.toLowerCase()
                         let bName = b.name.toLowerCase()
 
                         if (aName == bName) return defaultSort(a, b)
-                        else return aName > bName
-                    }
+                        else return aName > bName ? 1 : -1
+                }
             })
 
             if (this.sortMethodReverse) sorted = sorted.reverse()
@@ -208,7 +208,7 @@ export default {
                     || (val.approval == null  && this.filterStatus[1].enabled)
                     || (val.approval == false && this.filterStatus[2].enabled)
             })
-            if (!Number.isNaN(this.filterId)) {
+            if (this.filterId) {
                 sorted = sorted.filter(val => {
                     return val.id == this.filterId
                 })
@@ -219,7 +219,7 @@ export default {
         sortMethod() { return this.$route.query.sortBy == null ? 1 : parseInt(this.$route.query.sortBy) },
         sortMethodReverse() { return this.$route.query.reverse == null ? true : JSON.parse(this.$route.query.reverse) },
         filterAuthor() { return this.$route.query.author || "" },
-        filterId() { return parseInt(this.$route.query.id || "") },
+        filterId() { return this.$route.query.id || "" },
         filterStatus() { return [
             {
                 name: "Approved",
