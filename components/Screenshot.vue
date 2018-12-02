@@ -32,6 +32,8 @@
 
 <script>
 
+import Vue from "vue"
+
 import axios from "axios"
 import SteamID from "steamid"
 
@@ -107,7 +109,6 @@ export default {
                                 break
                         }
                         this.previous = dir
-                        this.$nextTick(() => this.$forceUpdate())
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => {
@@ -128,14 +129,13 @@ export default {
                         switch (dir) {
                             case "approve":
                                 this.setMessage("approved!")
-                                this.screenshot.approval = true
+                                Vue.set(this.screenshot, "approval", true)
                                 break
                             case "deny":
                                 this.setMessage("denied!")
-                                this.screenshot.approval = false
+                                Vue.set(this.screenshot, "approval", false)
                                 break
                         }
-                        this.$nextTick(() => this.$forceUpdate())
                     } else throw Error(res.data.errors.join("\n"))
                 })
                 .catch(err => console.error(err))

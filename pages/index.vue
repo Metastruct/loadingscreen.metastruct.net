@@ -18,9 +18,9 @@
                 p.menu-label.has-text-primary Filter by
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") ID
                 .control
-                    input.input(type="text" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
+                    input.input(type="text" placeholder="ID" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Author
-                input.input(type="text" placeholder="Author" v-model="filterAuthor")
+                input.input(type="text" placeholder="Author" v-model="filterAuthor" @input="pushQuery({ author: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Status
                 .control(v-for="filter in filterStatus")
                     label.checkbox
@@ -65,6 +65,7 @@
 
 
         section.section
+            h1.title.has-text-centered {{ sortedScreenshots.length + " screenshots" }}
             screenshot-grid(v-if="screenshots.length > 0" :screenshots="sortedScreenshots")
             .google-loading(v-else)
                 Loading
@@ -174,7 +175,7 @@ export default {
     computed: {
         sortedScreenshots() {
             // Sort by
-            let sorted = this.screenshots.slice().sort((a, b) => {
+            let sorted = this.screenshots.sort((a, b) => {
                 switch (this.sortMethod) {
                     default:
                     case 0: // ID
