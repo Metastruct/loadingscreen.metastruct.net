@@ -82,7 +82,7 @@ export default {
         },
         vote(id, dir) {
             if (!this.$store.state.authed.success) {
-                this.setMessage("log in to vote!")
+                window.location.href = "https://g2cf.metastruct.net/lsapi/login"
                 return
             }
 

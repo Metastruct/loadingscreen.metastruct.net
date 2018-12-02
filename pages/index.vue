@@ -287,7 +287,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: lighten($background, 7.5%);
+        background: $primary;
         height: 3.5rem;
         width: 3.5rem;
         bottom: 1.5rem;
@@ -295,7 +295,7 @@ export default {
         transform: translateX(100%);
         border: none;
         border-radius: 50%;
-        color: $text;
+        color: $dark;
         box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);
         transition: filter 0.05s ease-in;
 
