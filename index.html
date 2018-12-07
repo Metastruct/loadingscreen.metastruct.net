@@ -1,0 +1,134 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="description" content="loading">
+	<meta name="author" content="Meta Construct">
+
+	<style type="text/css">
+		html,body {
+			
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			
+			background-color: #333;
+
+		}
+		
+		#splash1 {
+			width: 100%;
+			height: auto;
+			bottom: 0px;
+			top: 0px;
+			left: 0;
+			position: absolute;
+		}
+
+		#splashcenter1 {
+			transition: all 0.3s ease-out;
+			transform: scale(1);
+			color: rgba(240, 240, 240, 0.9);
+			position: absolute;
+			overflow: visible;
+			
+			text-shadow: 0px 0px 3px rgba(94, 94, 96, 1);
+			
+			width: 800px;
+			margin-left: -400px;
+			
+			top: 50%;
+			left: 50%;
+			
+			font-size: 90px;
+			height: 90px;
+			margin-top: -45px;
+			
+			font-family: sans-serif;
+			text-align: center;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div id="img1"></div>
+	<div id="credits"></div>
+	<div id='splash1'>
+	  <h1 id="splashcenter1">Meta Construct</h1>
+	</div>
+	<div class="meter" id="progress1meter" style="display: none;">
+		<span class="progresstext" id="progress1text">
+			00:00
+		</span>
+		<div id="progress1hide">
+			<span id="progress1" class="meter_inner"></span>
+			<span id="progress50" class="meter_stop">
+				<span id="progress50" class="meter_stop_text">50% of players</span>
+			</span>
+			
+			<span id="progress99" class="meter_stop">
+				<span id="progress99" class="meter_stop_text">99% of players</span>
+			</span>
+		</div>
+	</div>
+	<div id="console">
+	</div>
+	<script>
+		
+		DOWNLOAD_FILES  = 0
+		STATUS_CHANGED  = 1
+		FILES_NEEDED    = 2
+		FILES_TOTAL     = 3
+		
+		gmod_queue = [];
+		
+		(function() { // Handle gmod API callbacks
+			var q = gmod_queue;
+			function OnGQueue() {
+				if ( window.OnGmodQueue ) {
+					OnGmodQueue(q);
+				}
+			}
+			
+			// GMod api
+			window.DownloadingFile = function (a,b,c) { q.push([DOWNLOAD_FILES	,a,b,c]); OnGQueue(); }; 
+			window.SetStatusChanged= function (a,b,c) { q.push([STATUS_CHANGED	,a,b,c]); OnGQueue(); }; 
+			window.SetFilesNeeded  = function (a,b,c) { q.push([FILES_NEEDED	,a,b,c]); OnGQueue(); };
+			window.SetFilesTotal   = function (a,b,c) { q.push([FILES_TOTAL	 	,a,b,c]); OnGQueue(); };
+
+		})();
+
+		(function(){ // Preload image list
+		
+			var resource = document.createElement('link'); 
+			resource.setAttribute("rel", "stylesheet");
+			resource.setAttribute("href","main.css");
+			resource.setAttribute("type","text/css");      
+			var head = document.getElementsByTagName('head')[0];
+			head.appendChild(resource);
+			
+			var xobj = new XMLHttpRequest();
+			xobj.overrideMimeType("application/json");
+			xobj.open('GET', "https://g2cf.metastruct.net/lsapi", true);
+			xobj.onreadystatechange = function () {
+				if (xobj.readyState == 4 && xobj.status == "200") {
+					imageslist = JSON.parse(xobj.responseText);
+					console.log("Loaded images");
+					if (typeof OnImagesLoaded !== 'undefined') {
+						OnImagesLoaded(imageslist);
+					}
+				}
+			};
+			xobj.send(null);  
+		})();
+	</script>
+	<script defer src="jquery.js"></script>
+	<script defer src="velocity.js"></script>
+	<script defer src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+#console {
+	
+	width: 600px;
+	position: absolute;
+	left: 32px;
+	bottom: 100px;
+	color: #fff;
+
+    text-shadow: 	-1px -1px 0 #000,
+					-1px  1px 0 #000,
+					 1px -1px 0 #000,
+					 1px  1px 0 #000; 
+	
+	font-family: Arial;
+	font-weight: 800;  
+	font-size: 14px;
+	
+}
+#credits {
+	
+    text-shadow: 	-1px -1px 0 #007,
+					-1px  1px 0 #007,
+					 1px  1px 0 #007; 
+					 
+	color: rgba(200,200,255,0.8);
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+.meter_stop_text {
+	position: relative;
+	font-family: Consolas;    
+	font-size: 13px;
+	color: #fa0;
+	bottom: -5px;
+	left: 5px;
+	display: block;
+	width: 100px;
+}
+
+#progress50 {
+	left: 40%;
+	visibility: hidden;
+}
+#progress99 {
+	left: 90%;
+	visibility: hidden;
+}
+.meter_stop {
+	width: 2px;
+	background-color: #fa0;
+	margin-left: -1px;
+	position: absolute;
+	left: 50%;
+	height: 10px;
+    box-shadow: 0px 0px 6px 1px rgba(255,198,0,0.7);
+}
+.progresstext {
+	font-family: Consolas;    
+	font-size: 13px;
+	color: #fff;
+	position: absolute;
+	bottom: -1px;
+	width: 120px;
+	left: 50%;
+	margin-left: -60px;
+	text-align: center;
+}
+#img1,#img2 {
+	width: 100%;
+	height: auto;
+	bottom: 0px;
+	top: 0px;
+	left: 0;
+	position: absolute;
+}
+
+.meter { 
+	height: 5px;
+	background: rgba(55,55,55,0.5);
+}
+#progress1meter {
+	position: absolute;
+	bottom: 30px;
+	left: 50%;
+	width: 600px;
+	margin-left: -300px;
+}
+
+.meter_inner {
+	width: 100%;
+    height: 1px;
+    margin: 2px 0;
+    background: #2187e7;
+    position: absolute;
+    box-shadow: 0px 0px 6px 1px rgba(0,198,255,0.7);
+	overflow: hidden;
+}
+
+
+
+			
+#tickerw {
+	position: fixed;
+	right: 5px;
+	top: 5px;
+	min-width:128px;
+	overflow: visible;
+	
+}
+#ticker {
+	overflow: visible;
+	
+	margin:0; padding:0;
+}
+
+.avatarimg {
+	height: 92px;
+	width: auto;
+	display: block;
+}
+
+.tickerentry {
+	
+	
+	
+	display:block;
+	width: 92px;
+	line-height: normal;
+	overflow: visible;
+	margin-top: 30px;
+	background-color: rgba(40,40,40,0.8);
+	color:#fafafa;
+	/*border-right:1px solid #333;*/
+	font-size: 9px;
+	text-align: left;
+	font-family: sans-serif;
+}
+.tickerentrytxt
+{
+	display: block;
+	padding: 4px;
+	width: auto;
+	white-space: normal;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
