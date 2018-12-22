@@ -5,8 +5,15 @@
         aside.sidebar(:class="{ 'is-expanded': sidebar }")
             .sidebar-background(@click="toggleSidebar")
             .menu
-                a(href="https://metastruct.net")
-                    img(src="@/assets/logo.png")
+                p.menu-label.has-text-primary Actions
+                ul.menu-list
+                    a.is-flex(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login")
+                        i.material-icons person
+                        p &nbsp;Login
+                    template(v-if="$store.state.authed.success")
+                        a.is-flex(@click="submit")
+                            i.material-icons add_to_queue
+                            p &nbsp;Submit new image
                 p.menu-label.has-text-primary Sort by
                 ul.menu-list
                     a(v-for="(name, k) in sortMethods" @click="pushQuery({ sortBy: k })" :class="{ 'is-active': sortMethod == k }") {{ name }}
@@ -26,28 +33,32 @@
                     label.checkbox
                         input(type="checkbox" v-model="filter.enabled" style="margin-right: 0.5em;" @change="pushQuery({ [filter.name.toLowerCase()]: filter.enabled })")
                         | {{ filter.name }}
-                p.menu-label.has-text-primary Actions
-                ul.menu-list
-                    a.is-flex(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login")
-                        i.material-icons person
-                        p &nbsp;Login
-                    template(v-if="$store.state.authed.success")
-                        a.is-flex(@click="submit")
-                            i.material-icons add_to_queue
-                            p &nbsp;Submit new image
+                .menu-bottom.has-text-centered
+                    p
+                        | by
+                        |
+                        a(href="https://tenrys.pw") Tenrys
+                        |
+                        | (front-end),
+                        |
+                        a(href="https://steamcommunity.com/profiles/76561197986413226/") Python1320
+                        |
+                        | (back-end)
+                    p Copyright © 2018-2019
             button.collapse-button(@click="toggleSidebar")
                 i.material-icons.md-light(v-if="!sidebar") keyboard_arrow_right
                 i.material-icons.md-light(v-else) keyboard_arrow_left
 
-        section.hero.is-small.is-primary.is-bold
+        section.hero.main
             .hero-body
-                .container
-                    h1.title Metastruct Loading Screen Gallery
+                .container.has-text-centered
+                    a(href="https://metastruct.net")
+                        img.logo(src="@/assets/logo.png")
         section.hero.is-small
             .hero-body
                 .container
                     .content
-                        h2 Welcome!
+                        h2 Welcome to the Loading Screen gallery!
                         p
                             | This is the gallery of screenshots displayed while you are loading into our servers.
                             br
@@ -62,7 +73,6 @@
                             | to sort and filter the grid to your convenience.
                         p
                             | If you think your screenshots should be approved, make sure to get a lot of ratings!
-
 
         section.section
             h1.title.has-text-centered {{ sortedScreenshots.length + " screenshots" }}
@@ -273,12 +283,18 @@ export default {
     .menu {
         position: relative;
         overflow: auto;
+        display: flex;
+        flex-direction: column;
         padding: 1rem;
         background: lighten($background, 7.5%);
         max-width: 16.66rem;
         width: 100%;
         height: 100%;
         box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.5);
+
+        .menu-bottom {
+            margin-top: auto;
+        }
     }
 
     button.collapse-button {
@@ -325,6 +341,17 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.hero {
+    &.main {
+        background: url('https://metastruct.net/img/banner/2.jpg');
+        background-size: cover;
+    }
+
+    .logo {
+        height: 128px;
+    }
 }
 
 </style>
