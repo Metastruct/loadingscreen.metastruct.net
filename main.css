@@ -27,45 +27,6 @@
 	top: 4px;
 	right: 4px;
 }
-.meter_stop_text {
-	position: relative;
-	font-family: Consolas;    
-	font-size: 13px;
-	color: #fa0;
-	bottom: -5px;
-	left: 5px;
-	display: block;
-	width: 100px;
-}
-
-#progress50 {
-	left: 40%;
-	visibility: hidden;
-}
-#progress99 {
-	left: 90%;
-	visibility: hidden;
-}
-.meter_stop {
-	width: 2px;
-	background-color: #fa0;
-	margin-left: -1px;
-	position: absolute;
-	left: 50%;
-	height: 10px;
-    box-shadow: 0px 0px 6px 1px rgba(255,198,0,0.7);
-}
-.progresstext {
-	font-family: Consolas;    
-	font-size: 13px;
-	color: #fff;
-	position: absolute;
-	bottom: -1px;
-	width: 120px;
-	left: 50%;
-	margin-left: -60px;
-	text-align: center;
-}
 #img1,#img2 {
 	width: 100%;
 	height: auto;
@@ -78,13 +39,6 @@
 .meter { 
 	height: 5px;
 	background: rgba(55,55,55,0.5);
-}
-#progress1meter {
-	position: absolute;
-	bottom: 30px;
-	left: 50%;
-	width: 600px;
-	margin-left: -300px;
 }
 
 .meter_inner {
@@ -145,3 +99,90 @@
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 }
+
+
+
+
+
+
+
+
+	
+	#progress {
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		
+		height: 10px;
+		position: fixed;
+		overflow: visible;
+		color: #fff;
+		width: 100%;
+		font-size: 12px;
+		font-weight: bold;
+	}
+	#progressBG {
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,8,0,1)), color-stop(24%,rgba(255,8,0,0.76)), color-stop(100%,rgba(255,8,0,0)));
+		background: -webkit-linear-gradient(top,  rgba(255,8,0,1) 0%,rgba(255,8,0,0.76) 24%,rgba(255,8,0,0) 100%);
+		background: linear-gradient(to bottom,  rgba(255,8,0,1) 0%,rgba(255,8,0,0.76) 24%,rgba(255,8,0,0) 100%);
+
+		overflow: visible;
+		width: 100%;
+		height: inherit;
+		position: absolute;
+		text-align: right;
+	}
+	#progress50 {
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,170,5,1)), color-stop(24%,rgba(0,170,5,0.76)), color-stop(100%,rgba(0,170,5,0)));
+		background: -webkit-linear-gradient(top,  rgba(0,170,5,1) 0%,rgba(0,170,5,0.76) 24%,rgba(0,170,5,0) 100%);
+		background: linear-gradient(to bottom,  rgba(0,170,5,1) 0%,rgba(0,170,5,0.76) 24%,rgba(0,170,5,0) 100%);
+
+		overflow: visible;
+		width: 33%;
+		height: inherit;
+		position: absolute;
+		text-align: right;
+	}
+	#progressYOU {
+	
+		overflow: visible;
+		width: 100%;
+		height: inherit;
+		border-right: 2px #FFF solid;
+		position: absolute;
+		text-align: right;
+	}
+	#progress99 {
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,238,0,1)), color-stop(24%,rgba(255,238,0,0.76)), color-stop(100%,rgba(255,238,0,0)));
+		background: -webkit-linear-gradient(top,  rgba(255,238,0,1) 0%,rgba(255,238,0,0.76) 24%,rgba(255,238,0,0) 100%);
+		background: linear-gradient(to bottom,  rgba(255,238,0,1) 0%,rgba(255,238,0,0.76) 24%,rgba(255,238,0,0) 100%);
+
+		width: 90%;
+		overflow: visible;
+		height: inherit;
+		position: absolute;
+		text-align: right;
+	}
+	#progress90 {
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,238,0,1)), color-stop(24%,rgba(255,238,0,0.76)), color-stop(100%,rgba(255,238,0,0)));
+		background: -webkit-linear-gradient(top,  rgba(255,238,0,1) 0%,rgba(255,238,0,0.76) 24%,rgba(255,238,0,0) 100%);
+		background: linear-gradient(to bottom,  rgba(255,238,0,1) 0%,rgba(255,238,0,0.76) 24%,rgba(255,238,0,0) 100%);
+
+		width: 90%;
+		overflow: visible;
+		height: inherit;
+		position: absolute;
+		text-align: right;
+	}
+	#progresssofar {
+		
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(165,255,0,1)), color-stop(100%,rgba(165,255,0,0)));
+		background: -webkit-linear-gradient(top,  rgba(165,255,0,1) 0%,rgba(165,255,0,0) 100%);
+		background: linear-gradient(to bottom,  rgba(165,255,0,1) 0%,rgba(165,255,0,0) 100%);
+
+		height: inherit;
+		overflow: visible;
+		width: 0%;
+		text-align: right;
+		padding-right: 3px;
+		position: absolute;
+	}
+	

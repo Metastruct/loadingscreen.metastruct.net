@@ -1,6 +1,7 @@
 function Now() { return new Date().getTime() / 1000; };
 function fmtMSS(s){return(s-(s%=60))/60+(9<s?':':':0')+s};
 var started = window.performance.timing.navigationStart/1000;
+var DEBUG=false;
 
 function Icon16(path) {
 	return {
@@ -125,6 +126,7 @@ function OnExtraInfo(data,textStatus, request,same_instance)
 		if (!same_instance) {
 			OnServerCrashed();
 		};
+		OnStats(data.stats);
 }
 
 function DoGmodQueue(entry) {
@@ -232,45 +234,129 @@ function OnServerCrashed() {
 	Log("Server",Color(255,22,20)," CRASHED",Color(255,2222,255),", reconnect manually!");
 }
 
-function OnPlayerLoadedData(dat) {
-	var loadingspeed = dat && dat.loadingspeed;
-	if (!dat) {
-		Log(Color(255,100,20),"First join",WHITE,"? ",Color(100,255,20),"Welcome",WHITE,", traveler!");
+var stats_gotten;
+var loadingspeed;
+var playerloaddata_finished = false;
+function OnStats(stats) {
+	if (stats_gotten) { return };
+	stats_gotten = stats;
+	DoLoadingBar();
+}
+
+var did_loadingbar;
+function DoLoadingBar() {
+	if (did_loadingbar || !stats_gotten || !playerloaddata_finished) {
+		return;
 	}
+	did_loadingbar = true;
 	
 	//LogD("OnPlayerLoadedData "+loadingspeed);
 	loadingspeed = loadingspeed || 0;
 	
-	var container = document.getElementById("progress1meter");
+	//var container = document.getElementById("progress1meter");
+	//
+	//$(container).fadeIn(2000);
+	//
+	//var prog = document.getElementById("progress1");
+	//var progtxt = document.getElementById("progress1text");
+	//function SetProgress1(f,txt)
+	//{
+	//	f=f>1 && 1 || f<0.01 && 0.01 || f;
+	//	prog.style.width = (f*100)+"%";
+	//	progtxt.textContent = txt;
+	//};
+	//var hiddenprogress = false;
+	//setInterval(function() {
+	//	var spent = Now()-started;
+	//	var remaining = loadingspeed-spent;
+	//
+	//	var txt = fmtMSS(~~ (remaining>=0 && remaining || spent ));
+	//	
+	//	if 	(remaining>=0) {	
+	//		txt += " / "+fmtMSS(~~ loadingspeed);
+	//	};
+	//	
+	//	if (!hiddenprogress && loadingspeed<spent) {
+	//		hiddenprogress = true;
+	//		$("#progress1hide").fadeOut(3000);
+	//	}
+	//	var f = (spent)/loadingspeed;
+	//	SetProgress1(f,txt);
+	//},1000/25);
 	
-	$(container).fadeIn(2000);
-	
-	var prog = document.getElementById("progress1");
-	var progtxt = document.getElementById("progress1text");
-	function SetProgress1(f,txt)
-	{
-		f=f>1 && 1 || f<0.01 && 0.01 || f;
-		prog.style.width = (f*100)+"%";
-		progtxt.textContent = txt;
+	var stats = {
+		"progress50": stats_gotten['percentile50'],
+		"progress99": stats_gotten['percentile99'],
+		"progress90": stats_gotten['percentile90'],
 	};
-	var hiddenprogress = false;
-	setInterval(function() {
-		var spent = Now()-started;
-		var remaining = loadingspeed-spent;
+	if (loadingspeed) {
+		stats["progressYOU"] = loadingspeed;
+	} else {
+		var a = document.getElementById("progressYOU");
+		a.style.display = "none";
+	};
+	
+	var worst = stats[Object.keys(stats).reduce(function(a, b){ return stats[a] > stats[b] ? a : b })];
+	
+	$.each(stats,function(elemid,time_taken) {
+		
+		var a = document.getElementById(elemid);
+		var frac = time_taken/worst;
+		a.style.width = (frac*100)+'%';
+		a.innerHTML += fmtMSS(time_taken);
+		a.innerHTML = '<span style="position: relative;top: 1em;">'+a.innerHTML+'</span>';
+	});
+	
+	if (stats["progressYOU"]) {
+		var a = document.getElementById("progressYOU");
+		a.innerHTML = '<span style="position: relative;top: 1em;">'+a.innerHTML+'</span>';
+	};
+	
+	var progresssofar = document.getElementById("progresssofar");
+	function SetProgressbar() {
 
-		var txt = fmtMSS(~~ (remaining>=0 && remaining || spent ));
+		window.requestAnimationFrame(SetProgressbar);
+
 		
-		if 	(remaining>=0) {	
-			txt += " / "+fmtMSS(~~ loadingspeed);
-		};
+		var seconds = (Now()-started)*(DEBUG?15:1);
 		
-		if (!hiddenprogress && loadingspeed<spent) {
-			hiddenprogress = true;
-			$("#progress1hide").fadeOut(3000);
-		}
-		var f = (spent)/loadingspeed;
-		SetProgress1(f,txt);
-	},1000/25);
+		var m = Math.floor(seconds / 60);
+		var s = Math.floor(seconds - m * 60);
+		
+		var txt = m+":"+(s<10?"0"+""+s:s);
+		
+		var time90 = 6.1*60; // 90% spawns faster than 6.1 minutes
+		
+		var frac=seconds/(time90*1.1); // this is a bit of a cheat...
+		
+		frac=frac>1?1:(frac<0?0:frac);
+		
+		progresssofar.style.width = (frac*100)+'%';
+		progresssofar.innerHTML = txt;
+		
+	}
+	window.requestAnimationFrame(SetProgressbar);
+	
+
+	var a = document.getElementById("progress");
+	a.style.display = "initial";
+	
+}
+
+function OnPlayerLoadedData(dat) {
+	loadingspeed = dat && dat.loadingspeed;
+	if (DEBUG) {
+		loadingspeed = 60*3;
+	};
+	
+	playerloaddata_finished = true;
+	DoLoadingBar();
+	
+	if (!dat) {
+		Log(Color(255,100,20),"First join",WHITE,"? ",Color(100,255,20),"Welcome",WHITE,", traveler!");
+	}
+	
+	
 }
 
 
@@ -653,3 +739,5 @@ $(function() {
 	$('<br>').appendTo($("#splashcenter1")); 
 	asd.appendTo($("#splashcenter1"));
 });
+
+
