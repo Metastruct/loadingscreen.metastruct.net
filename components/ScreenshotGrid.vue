@@ -4,8 +4,7 @@
 </template>
 
 <script>
-
-import Screenshot from "@/components/Screenshot.vue"
+import Screenshot from "@/components/Screenshot.vue";
 
 export default {
     components: {
@@ -14,12 +13,10 @@ export default {
     props: {
         screenshots: Array
     }
-}
-
+};
 </script>
 
 <style lang="scss">
-
 .screenshot-grid {
     display: flex;
     flex-wrap: wrap;
@@ -27,6 +24,4 @@ export default {
     align-content: flex-start;
     justify-content: space-evenly;
 }
-
 </style>
-

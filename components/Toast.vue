@@ -1,1 +1,0 @@
-<!-- Bulma toast component be here -->

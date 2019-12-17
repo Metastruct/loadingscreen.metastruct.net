@@ -7,166 +7,170 @@
             .details
                 .votes
                     a.upvotes.has-text-success(@click="vote(screenshot.id, 'up')" :class="{ unvoted: getOwnVote(screenshot.id) == false }" title="Upvote")
-                        i.material-icons thumb_up
+                        i.mdi.mdi-thumb-up
                         p {{ screenshot.up }}
                     a.downvotes.has-text-danger(@click="vote(screenshot.id, 'down')" :class="{ unvoted: getOwnVote(screenshot.id) == true }" title="Downvote")
-                        i.material-icons thumb_down
+                        i.mdi.mdi-thumb-down
                         p {{ screenshot.down }}
                 a.has-text-primary(v-if="screenshot.accountid != 0" :href="profileURL" target="_blank" title="Author") {{ screenshot.name }}
                 p(v-else title="Author") {{ screenshot.name }}
             .status(:class="{ pending: screenshot.approval == null, denied: screenshot.approval == false, approved: screenshot.approval == true }" title="Status")
                 p.has-text-light {{ timestamp }}
-                p(v-if="screenshot.approval == null") Pending
-                p(v-else-if="screenshot.approval == false") Denied
-                p(v-else-if="screenshot.approval == true") Approved
+                p(v-if="screenshot.approval === null") Pending
+                p(v-else-if="screenshot.approval === false") Denied
+                p(v-else-if="screenshot.approval === true") Approved
                 .judge
                     template(v-if="$store.state.authed.admin")
                         a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
-                            i.material-icons done
+                            i.mdi.mdi-done
                         a.has-text-danger(title="Deny" @click="setApproved(screenshot.id, 'deny')")
-                            i.material-icons clear
+                            i.mdi.mdi-clear
                     a.has-text-light(v-clipboard:copy="getGalleryURL()" v-clipboard:success="onCopyGalleryURL" title="Share")
-                        i.material-icons share
+                        i.mdi.mdi-share
 
 </template>
 
 <script>
-
-import Vue from "vue"
-
-import axios from "axios"
-import SteamID from "steamid"
+import axios from "axios";
+import SteamID from "steamid";
 
 function getUrlParamsString(obj) {
-    return new URLSearchParams(obj).toString()
+    return new URLSearchParams(obj).toString();
 }
 
 export default {
-    props: [ "screenshot" ],
+    props: ["screenshot"],
     data() {
         return {
             isVisible: false,
             message: "",
             timeout: null,
             previous: null
-        }
+        };
     },
     computed: {
         profileURL() {
-            return "https://steamcommunity.com/profiles/" + SteamID.fromIndividualAccountID(this.screenshot.accountid).getSteamID64()
+            return (
+                "https://steamcommunity.com/profiles/" +
+                SteamID.fromIndividualAccountID(this.screenshot.accountid).getSteamID64()
+            );
         },
         screenshotURL() {
-            let url = this.screenshot.url
-            if (!url.match(/^https?:\/\//i)) url = "http://" + url
-            return url
+            let url = this.screenshot.url;
+            if (!url.match(/^https?:\/\//i)) url = "http://" + url;
+            return url;
         },
         timestamp() {
-            let date = new Date(this.screenshot.created * 1e3).toISOString().substring(0, 10)
-            return date
+            const date = new Date(this.screenshot.created * 1e3).toISOString().substring(0, 10);
+            return date;
         }
     },
     methods: {
         visibilityChanged(isVisible) {
-            this.isVisible = isVisible
+            this.isVisible = isVisible;
         },
         setMessage(msg) {
-            this.message = msg
-            if (this.timeout) clearTimeout(this.timeout)
+            this.message = msg;
+            if (this.timeout) clearTimeout(this.timeout);
             this.timeout = setTimeout(() => {
-                this.message = ""
-            }, 3000)
+                this.message = "";
+            }, 3000);
         },
         onCopyGalleryURL() {
-            this.setMessage("copied link to clipboard!")
+            this.setMessage("copied link to clipboard!");
         },
         getGalleryURL() {
-            return location.origin + "/?id=" + this.screenshot.id
+            return location.origin + "/?id=" + this.screenshot.id;
         },
         vote(id, dir) {
             if (!this.$store.state.authed.success) {
-                window.location.href = "https://g2cf.metastruct.net/lsapi/login"
-                return
+                window.location.href = "https://g2cf.metastruct.net/lsapi/login";
+                return;
             }
 
-            let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
-            axios.post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
+            const params = getUrlParamsString({
+                csrf_token: this.$store.state.authed.csrf_token
+            });
+            axios
+                .post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
                 .then(res => {
                     if (!res.data.errors) {
                         switch (dir) {
                             case "up":
                             case "down":
-                                this.setMessage(dir + "voted!")
-                                this.screenshot[dir]++
-                                console.log(dir, this.previous)
+                                this.setMessage(dir + "voted!");
+                                this.screenshot[dir]++;
+                                console.log(dir, this.previous);
                                 if (!this.previous && this.getOwnVote() != null) {
-                                    this.screenshot[this.getOwnVote() ? "up" : "down"]--
-                                } else if (this.previous && this.previous != dir) {
-                                    this.screenshot[this.previous]--
+                                    this.screenshot[this.getOwnVote() ? "up" : "down"]--;
+                                } else if (this.previous && this.previous !== dir) {
+                                    this.screenshot[this.previous]--;
                                 }
-                                break
+                                break;
                             case "delete":
-                                this.setMessage("vote removed!")
-                                break
+                                this.setMessage("vote removed!");
+                                break;
                         }
-                        this.previous = dir
-                    } else throw Error(res.data.errors.join("\n"))
+                        this.previous = dir;
+                    } else throw Error(res.data.errors.join("\n"));
                 })
                 .catch(err => {
-                    if (err.response && err.response.status == 304 && dir != "delete") {
+                    if (err.response && err.response.status === 304 && dir !== "delete") {
                         // Already voted, let's delete it
-                        this.vote(id, "delete")
-                        if (this.previous != "delete") this.screenshot[dir]--
+                        this.vote(id, "delete");
+                        if (this.previous !== "delete") this.screenshot[dir]--;
                     } else {
-                        console.error(err)
+                        console.error(err);
                     }
-                })
+                });
         },
         setApproved(id, dir) {
-            let params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token })
-            axios.post(`https://g2cf.metastruct.net/lsapi/${dir}/${id}?${params}`)
+            const params = getUrlParamsString({
+                csrf_token: this.$store.state.authed.csrf_token
+            });
+            axios
+                .post(`https://g2cf.metastruct.net/lsapi/${dir}/${id}?${params}`)
                 .then(res => {
                     if (!res.data.errors) {
                         switch (dir) {
                             case "approve":
-                                this.setMessage("approved!")
-                                Vue.set(this.screenshot, "approval", true)
-                                break
+                                this.setMessage("approved!");
+                                this.$set(this.screenshot, "approval", true);
+                                break;
                             case "deny":
-                                this.setMessage("denied!")
-                                Vue.set(this.screenshot, "approval", false)
-                                break
+                                this.setMessage("denied!");
+                                this.$set(this.screenshot, "approval", false);
+                                break;
                         }
-                    } else throw Error(res.data.errors.join("\n"))
+                    } else throw Error(res.data.errors.join("\n"));
                 })
-                .catch(err => console.error(err))
+                .catch(err => console.error(err));
         },
         getOwnVote() {
-            if (!this.$store.state.myVotes.success) return null
+            if (!this.$store.state.myVotes.success) return null;
 
             if (this.previous != null) {
                 switch (this.previous) {
                     case "up":
-                        return true
+                        return true;
                     case "down":
-                        return false
+                        return false;
                     case "delete":
-                        return null
+                        return null;
                 }
             }
 
-            let id = this.screenshot.id
-            let upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id)
-            let downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id)
+            const id = this.screenshot.id;
+            const upvoted = this.$store.state.myVotes.up.includes && this.$store.state.myVotes.up.includes(id);
+            const downvoted = this.$store.state.myVotes.down.includes && this.$store.state.myVotes.down.includes(id);
 
-            return upvoted || (downvoted ? false : null)
+            return upvoted || (downvoted ? false : null);
         }
-    },
-}
-
+    }
+};
 </script>
 
 <style lang="scss">
-
 @import "@/assets/variables.scss";
 
 $width: 384px;
@@ -197,7 +201,8 @@ $height: 216px;
         transition: filter 0.33s ease-out;
         filter: blur(0px);
 
-        &.blurry { // Had to do this via JS sadly
+        &.blurry {
+            // Had to do this via JS sadly
             filter: blur(4px);
         }
     }
@@ -247,7 +252,8 @@ $height: 216px;
             align-content: center;
             align-items: center;
 
-            .upvotes, .downvotes {
+            .upvotes,
+            .downvotes {
                 display: inline-flex;
                 align-content: center;
                 align-items: center;
@@ -312,18 +318,19 @@ $height: 216px;
     }
 
     @media screen and (max-width: 768px) {
-        .details, .status {
+        .details,
+        .status {
             transform: translateY(0%);
             opacity: 1;
         }
     }
 
     &:hover {
-        .details, .status {
+        .details,
+        .status {
             transform: translateY(0%);
             opacity: 1;
         }
     }
 }
-
 </style>
