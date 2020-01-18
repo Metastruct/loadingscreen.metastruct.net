@@ -7,10 +7,10 @@
             .details
                 .votes
                     a.upvotes.has-text-success(@click="vote(screenshot.id, 'up')" :class="{ unvoted: getOwnVote(screenshot.id) == false }" title="Upvote")
-                        i.mdi.mdi-thumb-up
+                        i.mdi.mdi-thumb-up.mdi-24px
                         p {{ screenshot.up }}
                     a.downvotes.has-text-danger(@click="vote(screenshot.id, 'down')" :class="{ unvoted: getOwnVote(screenshot.id) == true }" title="Downvote")
-                        i.mdi.mdi-thumb-down
+                        i.mdi.mdi-thumb-down.mdi-24px
                         p {{ screenshot.down }}
                 a.has-text-primary(v-if="screenshot.accountid != 0" :href="profileURL" target="_blank" title="Author") {{ screenshot.name }}
                 p(v-else title="Author") {{ screenshot.name }}
@@ -22,11 +22,11 @@
                 .judge
                     template(v-if="$store.state.authed.admin")
                         a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
-                            i.mdi.mdi-check
+                            i.mdi.mdi-check.mdi-24px
                         a.has-text-danger(title="Deny" @click="setApproved(screenshot.id, 'deny')")
-                            i.mdi.mdi-close
+                            i.mdi.mdi-close.mdi-24px
                     a.has-text-light(v-clipboard:copy="getGalleryURL()" v-clipboard:success="onCopyGalleryURL" title="Share")
-                        i.mdi.mdi-share
+                        i.mdi.mdi-share.mdi-24px
 
 </template>
 
@@ -234,7 +234,7 @@ $height: 216px;
         align-items: center;
         position: absolute;
         text-align: left;
-        padding: 6px 6px;
+        padding: 0 6px;
         bottom: 0;
         left: 0;
         width: 100%;
@@ -277,7 +277,7 @@ $height: 216px;
         align-items: center;
         position: absolute;
         text-align: left;
-        padding: 6px 6px;
+        padding: 0 6px;
         top: 0;
         left: 0;
         width: 100%;
