@@ -35,7 +35,7 @@ module.exports = {
     /*
      ** Plugins to load before mounting the App
      */
-    plugins: ["~/plugins/vue-clipboard2", "~/plugins/vue-observe-visibility"],
+    plugins: ["~/plugins/vue-clipboard2", "~/plugins/vue-observe-visibility", "~/plugins/axios-defaults"],
 
     /*
      ** Nuxt.js modules
@@ -51,9 +51,6 @@ module.exports = {
      */
     axios: {
         // See https://github.com/nuxt-community/axios-module#options
-        init(axios) {
-            axios.defaults.withCredentials = true;
-        }
     },
 
     /*
