@@ -4,17 +4,17 @@
  * Released under the MIT License.
  */
 
-/**
- * vuex v3.1.2
- * (c) 2019 Evan You
- * @license MIT
- */
-
 /*!
   * vue-router v3.0.7
   * (c) 2019 Evan You
   * @license MIT
   */
+
+/**
+ * vuex v3.1.2
+ * (c) 2019 Evan You
+ * @license MIT
+ */
 
 /*!
  * Determine if an object is a Buffer
