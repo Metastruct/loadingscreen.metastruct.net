@@ -12,7 +12,7 @@
                         p &nbsp;Login
                     template(v-if="$store.state.authed.success")
                         a.is-flex(@click="submit")
-                            i.mdi.mdi-image-add
+                            i.mdi.mdi-image-plus
                             p &nbsp;Submit new image
                 p.menu-label.has-text-primary Sort by
                 ul.menu-list
@@ -83,11 +83,8 @@
 
 <script>
 import wilson from "wilson-score-interval";
-import axios from "axios";
 import Loading from "@/components/Loading.vue";
 import ScreenshotGrid from "@/components/ScreenshotGrid.vue";
-
-axios.defaults.withCredentials = true;
 
 const statusOrder = {
     [true]: 1,
@@ -209,17 +206,17 @@ export default {
         }
     },
     mounted() {
-        axios.get("https://g2cf.metastruct.net/lsapi").then(res => {
+        this.$axios.get("https://g2cf.metastruct.net/lsapi").then(res => {
             this.screenshots = res.data.result;
         });
 
-        axios
+        this.$axios
             .post("https://g2cf.metastruct.net/lsapi/auth")
             .then(res => {
                 if (res.data && res.data.success) {
                     this.$store.commit("updateAuthed", res.data);
 
-                    axios.get("https://g2cf.metastruct.net/lsapi/myvotes").then(res => {
+                    this.$axios.get("https://g2cf.metastruct.net/lsapi/myvotes").then(res => {
                         if (res.data && res.data.success) {
                             this.$store.commit("updateMyVotes", res.data);
                         }
@@ -245,7 +242,7 @@ export default {
 
             if (url) {
                 const params = getUrlParamsString({ csrf_token: this.$store.state.authed.csrf_token, url });
-                axios
+                this.$axios
                     .post(`https://g2cf.metastruct.net/lsapi?${params}`)
                     .then(res => {
                         alert(

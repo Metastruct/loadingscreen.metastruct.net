@@ -22,16 +22,15 @@
                 .judge
                     template(v-if="$store.state.authed.admin")
                         a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
-                            i.mdi.mdi-done
+                            i.mdi.mdi-check
                         a.has-text-danger(title="Deny" @click="setApproved(screenshot.id, 'deny')")
-                            i.mdi.mdi-clear
+                            i.mdi.mdi-close
                     a.has-text-light(v-clipboard:copy="getGalleryURL()" v-clipboard:success="onCopyGalleryURL" title="Share")
                         i.mdi.mdi-share
 
 </template>
 
 <script>
-import axios from "axios";
 import SteamID from "steamid";
 
 function getUrlParamsString(obj) {
@@ -91,7 +90,7 @@ export default {
             const params = getUrlParamsString({
                 csrf_token: this.$store.state.authed.csrf_token
             });
-            axios
+            this.$axios
                 .post(`https://g2cf.metastruct.net/lsapi/vote/${id}/${dir}?${params}`)
                 .then(res => {
                     if (!res.data.errors) {
@@ -128,7 +127,7 @@ export default {
             const params = getUrlParamsString({
                 csrf_token: this.$store.state.authed.csrf_token
             });
-            axios
+            this.$axios
                 .post(`https://g2cf.metastruct.net/lsapi/${dir}/${id}?${params}`)
                 .then(res => {
                     if (!res.data.errors) {
