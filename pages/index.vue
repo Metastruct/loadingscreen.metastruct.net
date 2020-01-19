@@ -25,9 +25,9 @@
                 p.menu-label.has-text-primary Filter by
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") ID
                 .control
-                    input.input(type="text" placeholder="ID" v-model="filterId" @input="pushQuery({ id: $event.target.value })")
+                    input.input(type="text" placeholder="ID" :value="filterId" @input="pushQuery({ id: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Author
-                input.input(type="text" placeholder="Author" v-model="filterAuthor" @input="pushQuery({ author: $event.target.value })")
+                input.input(type="text" placeholder="Author" :value="filterAuthor" @input="pushQuery({ author: $event.target.value })")
                 p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Status
                 .control(v-for="filter in filterStatus")
                     label.checkbox

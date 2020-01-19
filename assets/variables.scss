@@ -18,6 +18,9 @@ $subtitle-strong-color: $text-strong;
 $link: $primary;
 $link-hover: darken($primary, 7.5%);
 
+$input-background-color: $background;
+$input-border-color: lighten($background, 12.5%);
+$input-hover-border-color: lighten($background, 25%);
 $input-hover-color: $text-strong;
 
 // Navbar (unused?)
