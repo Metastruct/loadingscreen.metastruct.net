@@ -16,17 +16,28 @@
 	font-size: 14px;
 	
 }
+
 #credits {
-	
-    text-shadow: 	-1px -1px 0 #007,
-					-1px  1px 0 #007,
-					 1px  1px 0 #007; 
-					 
-	color: rgba(200,200,255,0.8);
+	text-shadow: 	-1px -1px 0 #666,
+		-1px  1px 0 #666,
+		1px  1px 0 #666; 
+	color: rgba(200,200,200,1);
 	position: absolute;
-	top: 4px;
-	right: 4px;
+	bottom: 30px;
+	left: 30px;
+	font-family: sans-serif;
+	font-weight: 100;
+	font-size: 0.8em;
 }
+
+#credits:before {
+	color: rgba(155,155,155,1);
+	text-shadow: 	-1px -1px 0 #666,
+		-1px  1px 0 #666,
+		1px  1px 0 #666; 
+  content: "Image by ";
+}
+
 #img1,#img2 {
 	width: 100%;
 	height: auto;
