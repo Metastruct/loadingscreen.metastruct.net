@@ -158,7 +158,7 @@ export default {
             });
             if (this.filterId) {
                 sorted = sorted.filter(val => {
-                    return val.id === this.filterId;
+                    return val.id === parseInt(this.filterId, 10);
                 });
             }
 
