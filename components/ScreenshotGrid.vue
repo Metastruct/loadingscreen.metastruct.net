@@ -24,7 +24,18 @@ export default {
     align-content: flex-start;
     justify-content: space-evenly;
 }
+.grid-enter,
+.grid-leave-to {
+    opacity: 0;
+}
 .grid-move {
-    transition: transform 1s;
+    transition: transform 0.5s;
+}
+.grid-enter-active,
+.grid-leave-active {
+    transition: all 0.5s;
+}
+.grid-leave-active {
+    position: absolute;
 }
 </style>
