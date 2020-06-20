@@ -1,5 +1,5 @@
 <template lang="pug">
-    .screenshot-grid
+    transition-group.screenshot-grid(name="grid", tag="div")
         screenshot(v-for="screenshot in screenshots" :screenshot="screenshot" :key="screenshot.id")
 </template>
 
@@ -23,5 +23,8 @@ export default {
     align-items: flex-start;
     align-content: flex-start;
     justify-content: space-evenly;
+}
+.grid-move {
+    transition: transform 1s;
 }
 </style>
