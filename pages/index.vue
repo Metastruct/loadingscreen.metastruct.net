@@ -75,7 +75,7 @@
                             | If you think your screenshots should be approved, make sure to get a lot of ratings!
 
         section.section
-            h1.title.has-text-centered {{ sortedScreenshots.length + " screenshots" }}
+            h1.title.has-text-centered {{ sortedScreenshots.length.toLocaleString() + " screenshots" }}
             screenshot-grid(v-if="screenshots.length > 0" :screenshots="sortedScreenshots")
             .google-loading(v-else)
                 Loading
@@ -144,21 +144,28 @@ export default {
             if (this.sortMethodReverse) sorted = sorted.reverse();
 
             // Filter by
-            sorted = sorted.filter(val => {
-                // Author
-                return val.name.toLowerCase().includes(this.filterAuthor.toLowerCase());
-            });
-            sorted = sorted.filter(val => {
-                // Status
-                return (
-                    (val.approval === true && this.filterStatus[0].enabled) ||
-                    (val.approval === undefined && this.filterStatus[1].enabled) ||
-                    (val.approval === false && this.filterStatus[2].enabled)
-                );
-            });
+            let ignoreStatus = false;
+            if (this.filterAuthor) {
+                sorted = sorted.filter(val => {
+                    // Author
+                    return val.name.toLowerCase().includes(this.filterAuthor.toLowerCase());
+                });
+                ignoreStatus = true;
+            }
             if (this.filterId) {
                 sorted = sorted.filter(val => {
                     return val.id === parseInt(this.filterId, 10);
+                });
+                ignoreStatus = true;
+            }
+            if (!ignoreStatus) {
+                sorted = sorted.filter(val => {
+                    // Status
+                    return (
+                        (val.approval === true && this.filterStatus[0].enabled) ||
+                        (val.approval === undefined && this.filterStatus[1].enabled) ||
+                        (val.approval === false && this.filterStatus[2].enabled)
+                    );
                 });
             }
 
@@ -205,7 +212,7 @@ export default {
             this.pushQuery({ author: this.filterAuthor });
         }
     },
-    mounted() {
+    created() {
         this.$axios.get("https://g2cf.metastruct.net/lsapi").then(res => {
             this.screenshots = res.data.result;
         });
@@ -314,6 +321,10 @@ export default {
 
         .menu-bottom {
             margin-top: auto;
+        }
+
+        .input::placeholder {
+            opacity: 0.5;
         }
     }
 
