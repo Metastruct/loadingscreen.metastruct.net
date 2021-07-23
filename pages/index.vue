@@ -1,84 +1,103 @@
 <!-- TODO: Split all this crap into multiple files? -->
 
 <template lang="pug">
-    div
-        aside.sidebar(:class="{ 'is-expanded': sidebar }")
-            .sidebar-background(@click="toggleSidebar")
-            .menu
-                p.menu-label.has-text-primary Actions
-                ul.menu-list
-                    a.is-flex(v-if="!$store.state.authed.success" href="https://g2cf.metastruct.net/lsapi/login")
-                        i.mdi.mdi-account
-                        p &nbsp;Login
-                    template(v-if="$store.state.authed.success")
-                        a.is-flex(@click="submit")
-                            i.mdi.mdi-image-plus
-                            p &nbsp;Submit new image
-                p.menu-label.has-text-primary Sort by
-                ul.menu-list
-                    a(v-for="(name, k) in sortMethods" @click="pushQuery({ sortBy: k })" :class="{ 'is-active': sortMethod == k }") {{ name }}
-                    // hr.navbar-divider
-                p.menu-label.has-text-primary Order
-                ul.menu-list
-                    a(@click="pushQuery({ reverse: false })" :class="{ 'is-active': sortMethodReverse == false }") Ascending
-                    a(@click="pushQuery({ reverse: true })" :class="{ 'is-active': sortMethodReverse == true }") Descending
-                p.menu-label.has-text-primary Filter by
-                p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") ID
-                .control
-                    input.input(type="text" placeholder="ID" :value="filterId" @input="pushQuery({ id: $event.target.value })")
-                p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Author
-                input.input(type="text" placeholder="Author" :value="filterAuthor" @input="pushQuery({ author: $event.target.value })")
-                p.menu-label.has-text-grey-light(style="margin: 0.5em 0;") Status
-                .control(v-for="filter in filterStatus")
-                    label.checkbox
-                        input(type="checkbox" v-model="filter.enabled" style="margin-right: 0.5em;" @change="pushQuery({ [filter.name.toLowerCase()]: filter.enabled })")
-                        | {{ filter.name }}
-                .menu-bottom.has-text-centered
+div
+    aside.sidebar(:class="{ 'is-expanded': sidebar }")
+        .sidebar-background(@click="toggleSidebar")
+        .menu
+            p.menu-label.has-text-primary Actions
+            ul.menu-list
+                a.is-flex(v-if="!$store.state.authed.success", href="https://g2cf.metastruct.net/lsapi/login")
+                    i.mdi.mdi-account
+                    p &nbsp;Login
+                template(v-if="$store.state.authed.success")
+                    a.is-flex(@click="submit")
+                        i.mdi.mdi-image-plus
+                        p &nbsp;Submit new image
+            p.menu-label.has-text-primary Sort by
+            ul.menu-list
+                a(
+                    v-for="(name, k) in sortMethods",
+                    @click="pushQuery({ sortBy: k })",
+                    :class="{ 'is-active': sortMethod == k }"
+                ) {{ name }}
+                // hr.navbar-divider
+            p.menu-label.has-text-primary Order
+            ul.menu-list
+                a(@click="pushQuery({ reverse: false })", :class="{ 'is-active': sortMethodReverse == false }") Ascending
+                a(@click="pushQuery({ reverse: true })", :class="{ 'is-active': sortMethodReverse == true }") Descending
+            p.menu-label.has-text-primary Filter by
+            p.menu-label.has-text-grey-light(style="margin: 0.5em 0") ID
+            .control
+                input.input(
+                    type="text",
+                    placeholder="ID",
+                    :value="filterId",
+                    @input="pushQuery({ id: $event.target.value })"
+                )
+            p.menu-label.has-text-grey-light(style="margin: 0.5em 0") Author
+            input.input(
+                type="text",
+                placeholder="Author",
+                :value="filterAuthor",
+                @input="pushQuery({ author: $event.target.value })"
+            )
+            p.menu-label.has-text-grey-light(style="margin: 0.5em 0") Status
+            .control(v-for="filter in filterStatus")
+                label.checkbox
+                    input(
+                        type="checkbox",
+                        v-model="filter.enabled",
+                        style="margin-right: 0.5em",
+                        @change="pushQuery({ [filter.name.toLowerCase()]: filter.enabled })"
+                    )
+                    | {{ filter.name }}
+            .menu-bottom.has-text-centered
+                p
+                    | by
+                    |
+                    a(href="https://tenrys.pw") Tenrys
+                    |
+                    | (front-end),
+                    |
+                    a(href="https://steamcommunity.com/profiles/76561197986413226/") Python1320
+                    |
+                    | (back-end)
+                p Copyright © 2018-2020
+        button.collapse-button(@click="toggleSidebar")
+            i.mdi.mdi-arrow-right(v-if="!sidebar")
+            i.mdi.mdi-arrow-left(v-else)
+
+    section.hero.main
+        .hero-body
+            .container.has-text-centered
+                a(href="https://metastruct.net")
+                    img.logo(src="@/assets/logo.png")
+    section.hero.is-small
+        .hero-body
+            .container
+                .content
+                    h2 Welcome to the Loading Screen gallery!
                     p
-                        | by
+                        | This is the gallery of screenshots displayed while you are loading into our servers.
+                        br
+                        a(href="https://g2cf.metastruct.net/lsapi/login") Log in with Steam
                         |
-                        a(href="https://tenrys.pw") Tenrys
+                        | in order to vote for your favorite screenshots, submit your own, and as a <b>developer</b>, manage screenshots submitted by other users by approving or denying them.
+                        br
+                        | You can use the
                         |
-                        | (front-end),
+                        a(@click="toggleSidebar") sidebar
                         |
-                        a(href="https://steamcommunity.com/profiles/76561197986413226/") Python1320
-                        |
-                        | (back-end)
-                    p Copyright © 2018-2020
-            button.collapse-button(@click="toggleSidebar")
-                i.mdi.mdi-arrow-right(v-if="!sidebar")
-                i.mdi.mdi-arrow-left(v-else)
+                        | to sort and filter the grid to your convenience.
+                    p
+                        | If you think your screenshots should be approved, make sure to get a lot of ratings!
 
-        section.hero.main
-            .hero-body
-                .container.has-text-centered
-                    a(href="https://metastruct.net")
-                        img.logo(src="@/assets/logo.png")
-        section.hero.is-small
-            .hero-body
-                .container
-                    .content
-                        h2 Welcome to the Loading Screen gallery!
-                        p
-                            | This is the gallery of screenshots displayed while you are loading into our servers.
-                            br
-                            a(href="https://g2cf.metastruct.net/lsapi/login") Log in with Steam
-                            |
-                            | in order to vote for your favorite screenshots, submit your own, and as a <b>developer</b>, manage screenshots submitted by other users by approving or denying them.
-                            br
-                            | You can use the
-                            |
-                            a(@click="toggleSidebar") sidebar
-                            |
-                            | to sort and filter the grid to your convenience.
-                        p
-                            | If you think your screenshots should be approved, make sure to get a lot of ratings!
-
-        section.section
-            h1.title.has-text-centered {{ sortedScreenshots.length.toLocaleString() + " screenshots" }}
-            screenshot-grid(v-if="screenshots.length > 0" :screenshots="sortedScreenshots")
-            .google-loading(v-else)
-                Loading
+    section.section
+        h1.title.has-text-centered {{ sortedScreenshots.length.toLocaleString() + ' screenshots' }}
+        screenshot-grid(v-if="screenshots.length > 0", :screenshots="sortedScreenshots")
+        .google-loading(v-else)
+            Loading
 </template>
 
 <script>

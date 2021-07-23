@@ -1,33 +1,47 @@
 <template lang="pug">
-    .screenshot(v-observe-visibility="visibilityChanged")
-        template(v-if="isVisible")
-            a(:href="screenshotURL" target="_blank")
-                img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`" :class="{ blurry: message }")
-            .message {{ message }}
-            .details
-                .votes
-                    a.upvotes.has-text-success(@click="vote(screenshot.id, 'up')" :class="{ unvoted: getOwnVote(screenshot.id) == false }" title="Upvote")
-                        i.mdi.mdi-thumb-up.mdi-24px
-                        p {{ screenshot.up }}
-                    a.downvotes.has-text-danger(@click="vote(screenshot.id, 'down')" :class="{ unvoted: getOwnVote(screenshot.id) == true }" title="Downvote")
-                        i.mdi.mdi-thumb-down.mdi-24px
-                        p {{ screenshot.down }}
-                a.has-text-primary(v-if="screenshot.accountid != 0" :href="profileURL" target="_blank" title="Author") {{ screenshot.name }}
-                p(v-else title="Author") {{ screenshot.name }}
-            .status(:class="{ pending: screenshot.approval == null, denied: screenshot.approval == false, approved: screenshot.approval == true }" title="Status")
-                p.has-text-light {{ timestamp }}
-                p(v-if="screenshot.approval === null") Pending
-                p(v-else-if="screenshot.approval === false") Denied
-                p(v-else-if="screenshot.approval === true") Approved
-                .judge
-                    template(v-if="$store.state.authed.admin")
-                        a.has-text-success(title="Approve" @click="setApproved(screenshot.id, 'approve')")
-                            i.mdi.mdi-check.mdi-24px
-                        a.has-text-danger(title="Deny" @click="setApproved(screenshot.id, 'deny')")
-                            i.mdi.mdi-close.mdi-24px
-                    a.has-text-light(v-clipboard:copy="getGalleryURL()" v-clipboard:success="onCopyGalleryURL" title="Share")
-                        i.mdi.mdi-share.mdi-24px
-
+.screenshot(v-observe-visibility="visibilityChanged")
+    template(v-if="isVisible")
+        a(:href="screenshotURL", target="_blank")
+            img(:src="`https://g2cf.metastruct.net/lsapi/i/${screenshot.id}.jpg`", :class="{ blurry: message }")
+        .message {{ message }}
+        .details
+            .votes
+                a.upvotes.has-text-success(
+                    @click="vote(screenshot.id, 'up')",
+                    :class="{ unvoted: getOwnVote(screenshot.id) == false }",
+                    title="Upvote"
+                )
+                    i.mdi.mdi-thumb-up.mdi-24px
+                    p {{ screenshot.up }}
+                a.downvotes.has-text-danger(
+                    @click="vote(screenshot.id, 'down')",
+                    :class="{ unvoted: getOwnVote(screenshot.id) == true }",
+                    title="Downvote"
+                )
+                    i.mdi.mdi-thumb-down.mdi-24px
+                    p {{ screenshot.down }}
+            a.has-text-primary(v-if="screenshot.accountid != 0", :href="profileURL", target="_blank", title="Author") {{ screenshot.name }}
+            p(v-else, title="Author") {{ screenshot.name }}
+        .status(
+            :class="{ pending: screenshot.approval == null, denied: screenshot.approval == false, approved: screenshot.approval == true }",
+            title="Status"
+        )
+            p.has-text-light {{ timestamp }}
+            p(v-if="screenshot.approval === null") Pending
+            p(v-else-if="screenshot.approval === false") Denied
+            p(v-else-if="screenshot.approval === true") Approved
+            .judge
+                template(v-if="$store.state.authed.admin")
+                    a.has-text-success(title="Approve", @click="setApproved(screenshot.id, 'approve')")
+                        i.mdi.mdi-check.mdi-24px
+                    a.has-text-danger(title="Deny", @click="setApproved(screenshot.id, 'deny')")
+                        i.mdi.mdi-close.mdi-24px
+                a.has-text-light(
+                    v-clipboard:copy="getGalleryURL()",
+                    v-clipboard:success="onCopyGalleryURL",
+                    title="Share"
+                )
+                    i.mdi.mdi-share.mdi-24px
 </template>
 
 <script>
@@ -99,7 +113,6 @@ export default {
                             case "down":
                                 this.setMessage(dir + "voted!");
                                 this.screenshot[dir]++;
-                                console.log(dir, this.previous);
                                 if (!this.previous && this.getOwnVote() != null) {
                                     this.screenshot[this.getOwnVote() ? "up" : "down"]--;
                                 } else if (this.previous && this.previous !== dir) {
@@ -111,7 +124,7 @@ export default {
                                 break;
                         }
                         this.previous = dir;
-                    } else throw Error(res.data.errors.join("\n"));
+                    } else throw new Error(res.data.errors.join("\n"));
                 })
                 .catch(err => {
                     if (err.response && err.response.status === 304 && dir !== "delete") {
@@ -141,7 +154,7 @@ export default {
                                 this.$set(this.screenshot, "approval", false);
                                 break;
                         }
-                    } else throw Error(res.data.errors.join("\n"));
+                    } else throw new Error(res.data.errors.join("\n"));
                 })
                 .catch(err => console.error(err));
         },
