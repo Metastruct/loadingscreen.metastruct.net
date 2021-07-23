@@ -1,15 +1,15 @@
 export const state = () => {
-    return {
-        authed: {},
-        myVotes: []
-    };
+  return {
+    authed: {},
+    myVotes: []
+  };
 };
 
 export const mutations = {
-    updateAuthed(state, auth) {
-        state.authed = auth;
-    },
-    updateMyVotes(state, votes) {
-        state.myVotes = votes;
-    }
+  updateAuthed(state, auth) {
+    state.authed = auth;
+  },
+  updateMyVotes(state, votes) {
+    state.myVotes = votes;
+  }
 };
