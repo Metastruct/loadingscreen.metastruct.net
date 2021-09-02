@@ -314,7 +314,7 @@ function OnImagesLoaded(res) {
 		if (!approved) {
 			continue;
 		}
-		var creator = dat['comment'];
+		var creator = dat['comment'] || dat['name'];
 		var url = dat['url'];
 		t.push([url, creator || ""]);
 	}
@@ -339,8 +339,11 @@ function OnImagesLoaded(res) {
 		var first = imgn == 0;
 		imgn = imgn + 1;
 
-		var src = "http://" + rndimage[0];
-
+		var src = rndimage[0];
+		src=src.replace("images.akamai.steamusercontent.com","steamuserimages-a.akamaihd.net")
+		if (src.indexOf("://")==-1) {
+			src = "https://"+src;
+		}
 		var credits = document.getElementById("credits");
 		var img = new Image();
 		img.onerror = function () {
@@ -534,12 +537,12 @@ function LoadPlayerList() {
 	var elem;
 	var ul;
 
-	var failurl = "http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/" +
+	var failurl = "https://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/" +
 		"fe/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg";
 
 	var serverid = $.urlParam('serverid') || $.urlParam('server') || 1;
 
-	var playersurl = 'http://g2cf.metastruct.net/app/playerlist?server=' + serverid
+	var playersurl = 'https://g2cf.metastruct.net/app/playerlist?server=' + serverid
 
 	var usrinfos = {};
 
