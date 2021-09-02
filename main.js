@@ -888,6 +888,10 @@ LoadPlayerList();
 // check if anything in queue
 OnGmodQueue();
 
+function sleep(s) {
+  return new Promise(resolve => setTimeout(resolve, s*1000));
+}
+
 
 $(function () {
 	if ((document.location + "").indexOf("changelev") == -1) {
@@ -898,4 +902,41 @@ $(function () {
 	asd.text("Changing level...");
 	$('<br>').appendTo($("#splashcenter1"));
 	asd.appendTo($("#splashcenter1"));
+});
+
+var tips=[
+	"Uh.... hello!",
+	"Have you escaped the lobby yet?",
+	"Do not crowbar the citizens!",
+	"Do not look into the moon",
+	"You can escape hell by [REDACTED]",
+	"The sauna has been in development since 2012",
+	"Have a pleasant journey loading",
+	"For merch and metastruct history please visit http://metastruct.net",
+	"We have Discord and steam forums! http://metastruct.net",
+	"To goto build instantly, run this in windows run prompt: steam://connect/g2.metastruct.net/GO:build",
+	"clippy.lua:16: attempt to call global 'hello' (a nil value)"
+];
+
+$(function () {
+	clippy.BASE_PATH = "./agents/";
+	clippy.load('Clippy', function(agent) {
+
+
+		async function run() {
+			await sleep(1+Math.random()*3);
+			agent.show();
+			
+			await sleep(3+Math.random()*4);
+			agent.animate();
+			
+			await sleep(5+Math.random()*3);
+			agent.speak(tips[Math.floor(Math.random()*tips.length)]);
+
+			await sleep(25+Math.random()*3);
+			agent.hide();
+		}
+
+		run();
+	});
 });
