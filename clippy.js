@@ -514,7 +514,7 @@ clippy.Animator.prototype = {
             var snd = this._data.sounds[i];
             var uri = sounds[snd];
             if (!uri) continue;
-            this._sounds[snd] = new Audio(uri);
+            //this._sounds[snd] = new Audio(uri);
 
         }
     },
@@ -597,8 +597,8 @@ clippy.Animator.prototype = {
     _playSound:function () {
         var s = this._currentFrame.sound;
         if (!s) return;
-        var audio = this._sounds[s];
-        if (audio) audio.play();
+        //var audio = this._sounds[s];
+        //if (audio) audio.play();
     },
 
     _atLastFrame:function () {
