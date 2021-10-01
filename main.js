@@ -907,7 +907,7 @@ $(function () {
 	asd.appendTo($("#splashcenter1"));
 });
 
-var tips=[
+/*var tips=[
 	"Uh.... hello!",
 	"Have you escaped the lobby yet?",
 	"Do not crowbar the citizens!",
@@ -942,4 +942,4 @@ $(function () {
 
 		run();
 	});
-});
+});*/
