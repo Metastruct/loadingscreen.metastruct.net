@@ -72,7 +72,7 @@ div
           a(href="https://steamcommunity.com/profiles/76561197986413226/") Python1320
           |
           | (back-end)
-        p Copyright © 2018-2020
+        p Copyright © 2018-2022
     button.collapse-button(@click="toggleSidebar")
       i.mdi.mdi-arrow-right(v-if="!sidebar")
       i.mdi.mdi-arrow-left(v-else)
