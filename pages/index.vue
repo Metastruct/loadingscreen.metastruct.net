@@ -58,7 +58,7 @@ div
             type="checkbox",
             v-model="filter.enabled",
             style="margin-right: 0.5em",
-            @change="pushQuery({ [filter.name.toLowerCase()]: filter.enabled })"
+            @change="pushQuery({ [filter.name?.toLowerCase()]: filter.enabled })"
           )
           | {{ filter.name }}
       .menu-bottom.has-text-centered
@@ -161,8 +161,8 @@ export default {
             if (a.created === b.created) return defaultSort(a, b);
             else return a.created > b.created ? 1 : -1;
           case 3: // Author
-            const aName = a.name.toLowerCase();
-            const bName = b.name.toLowerCase();
+            const aName = a.name?.toLowerCase();
+            const bName = b.name?.toLowerCase();
 
             if (aName === bName) return defaultSort(a, b);
             else return aName > bName ? 1 : -1;
@@ -176,7 +176,7 @@ export default {
       if (this.filterAuthor) {
         sorted = sorted.filter(val => {
           // Author
-          return val.name.toLowerCase().includes(this.filterAuthor.toLowerCase());
+          return val.name?.toLowerCase()?.includes(this.filterAuthor.toLowerCase());
         });
         ignoreStatus = true;
       }
